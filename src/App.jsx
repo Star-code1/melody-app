@@ -1,9 +1,10 @@
-import { useState } from 'react'
 import LikedSongsPage from './pages/LikedSongs'
+import SearchPage from './pages/SearchPage'
 function App() {
   return (
     <>
       <LikedSongsPage />
+      <SearchPage />
     </>
   )
 }

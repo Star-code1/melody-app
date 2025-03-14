@@ -30,33 +30,33 @@ const LikedSongsPage = () => {
 
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-emerald-900 text-white" onClick={handleClickOutside}>
+    <div className="flex flex-col h-screen bg-black text-white" onClick={handleClickOutside}>
 
-      <div className="flex p-8 items-end space-x-6">
-        <div className="bg-gradient-to-br from-purple-500 to-blue-500 w-46 h-46 flex items-center justify-center rounded-lg shadow-2xl">
+      <div className="flex p-8 items-end space-x-6 bg-gradient-to-r from-red-900/50 to-black">
+        <div className="bg-gradient-to-br from-red-600 to-red-400 w-46 h-46 flex items-center justify-center rounded-lg shadow-2xl">
           <Heart size={100} fill="white" color="white" className="drop-shadow-xl" />
         </div>
         <div className="flex flex-col">
           <span className="uppercase text-sm font-semibold">Playlist</span>
-          <h1 className="text-8xl font-bold mb-6">Liked Songs</h1>
+          <h1 className="text-8xl font-bold mb-6 bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent">Liked Songs</h1>
           <div className="flex items-center text-sm">
             <span className="opacity-80">Những bài hát bạn yêu thích</span>
           </div>
         </div>
       </div>
 
-      <div className="px-8 py-4 flex items-center space-x-6 bg-black bg-opacity-20">
-        <button className="bg-green-500 hover:bg-green-400 rounded-full w-14 h-14 flex items-center justify-center shadow-lg">
-          <Play size={28} fill="black" className="ml-1" />
+      <div className="px-8 py-4 flex items-center space-x-6 bg-gradient-to-r from-gray-900 to-black">
+        <button className="bg-red-600 hover:bg-red-500 rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-colors duration-300">
+          <Play size={28} fill="white" className="ml-1" />
         </button>
-        <button>
-          <Heart size={32} fill="#1DB954" className="text-green-500" />
+        <button className="opacity-70 hover:opacity-100 transition-opacity duration-300">
+          <Heart size={32} fill="#dc2626" className="text-red-600" />
         </button>
-        <button>
-          <MoreHorizontal size={24} className="opacity-70 hover:opacity-100" />
+        <button className="opacity-70 hover:opacity-100 transition-opacity duration-300">
+          <MoreHorizontal size={24} />
         </button>
       </div>
-      <div className="flex-1 px-8 overflow-y-auto backdrop-blur-sm bg-black bg-opacity-20">
+      <div className="flex-1 px-8 overflow-y-auto backdrop-blur-sm bg-gradient-to-b from-gray-900/80 to-black">
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-white border-opacity-10 text-sm opacity-70">
@@ -74,43 +74,54 @@ const LikedSongsPage = () => {
             {likedSongs.map((song, index) => (
               <tr
                 key={song.id}
-                className={`border-b border-white border-opacity-5 hover:bg-gray-800 hover:bg-opacity-10 ${currentSong === song.id ? 'bg-gray-500 bg-opacity-20' : ''}`}
+                className={`border-b border-white border-opacity-5 hover:bg-gradient-to-r hover:from-gray-900 hover:to-red-900/30 hover:border-l-4 hover:border-red-600 transition-all duration-300 group ${currentSong === song.id ? 'bg-gradient-to-r from-red-900/20 to-transparent border-l-4 border-red-600' : ''}`}
                 onDoubleClick={() => handlePlay(song.id)}
               >
-                <td className="px-4 py-5 text-center text-lg">
+                <td className="px-4 py-5 text-center text-lg relative">
                   {currentSong === song.id ?
-                    <Music size={20} className="text-green-500" /> :
-                    <span className="opacity-70">{index + 1}</span>
+                    <Music size={20} className="text-red-600" /> :
+                    <span className="opacity-70 group-hover:opacity-0 transition-opacity duration-300">{index + 1}</span>
+                  }
+                  {currentSong !== song.id && 
+                    <Play size={20} className="text-red-600 absolute opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-4" />
                   }
                 </td>
                 <td className="px-4 py-5">
                   <div className="flex items-center">
-                    <img src={song.coverArt} alt={song.title} className="w-16 h-16 mr-6 rounded shadow-md" />
-                    <div>
-                      <div className={`text-xl font-bold ${currentSong === song.id ? 'text-green-500' : ''}`}>{song.title}</div>
-                      <div className="text-base opacity-70">{song.artist}</div>
+                    <div className="relative">
+                      <div className={`absolute inset-0 rounded-md ${currentSong === song.id ? 'shadow-lg shadow-red-900' : ''}`}></div>
+                      <img src={song.coverArt} alt={song.title} className="w-16 h-16 rounded-md object-cover border border-gray-800" />
+                      <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md">
+                        <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center transform scale-90 group-hover:scale-100 transition-transform duration-300">
+                          <Play size={16} fill="white" className="ml-0.5" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="ml-6">
+                      <div className={`text-xl font-semibold ${currentSong === song.id ? 'text-red-600' : 'text-white group-hover:text-red-400'} transition-colors duration-300`}>{song.title}</div>
+                      <div className="text-base text-gray-400">{song.artist}</div>
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-5 opacity-70 text-lg">{song.album}</td>
-                <td className="px-4 py-5 text-right opacity-70 text-lg">{song.duration}</td>
+                <td className="px-4 py-5 text-gray-400 text-lg">{song.album}</td>
+                <td className="px-4 py-5 text-right text-gray-400 text-lg">{song.duration}</td>
                 <td className="px-2 py-5 text-right relative" onClick={(e) => {
                   e.stopPropagation();
                   setActiveMenu(activeMenu === song.id ? null : song.id);
                 }}>
-                  <Ellipsis size={24} />
+                  <Ellipsis size={24} className="opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   {activeMenu === song.id && (
                      <div className="absolute right-0 top-20 bg-gray-800 rounded-md shadow-lg py-2 w-52 z-10">
-                     <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-700 flex items-center">
+                     <button className="w-full px-4 py-2 text-left text-sm hover:bg-gradient-to-r hover:from-gray-700 hover:to-red-900/20 flex items-center transition-colors duration-200">
                        <UserPlus size={16} className="mr-3" />
                        <span>Add to playlist</span>
                      </button>
-                     <button className="w-full px-4 py-2 text-left text-sm hover:bg-gray-700 flex items-center">
+                     <button className="w-full px-4 py-2 text-left text-sm hover:bg-gradient-to-r hover:from-gray-700 hover:to-red-900/20 flex items-center transition-colors duration-200">
                        <Download size={16} className="mr-3" />
                        <span>Download</span>
                      </button>
                      <div className="border-t border-gray-700 my-1"></div>
-                     <button className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gray-700 flex items-center">
+                     <button className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-gradient-to-r hover:from-gray-700 hover:to-red-900/20 flex items-center transition-colors duration-200">
                        <Trash2 size={16} className="mr-3" />
                        <span>Delete</span>
                      </button>
