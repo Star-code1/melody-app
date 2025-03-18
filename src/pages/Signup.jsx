@@ -414,9 +414,8 @@ function Signup() {
                 <div className="d-flex gap-3 flex-wrap">
                   <Form.Check type="radio" label="Nam" name="gender" value="Nam" checked={formData.gender === "Nam"} onChange={handleChange} />
                   <Form.Check type="radio" label="Nữ" name="gender" value="Nữ" checked={formData.gender === "Nữ"} onChange={handleChange} />
-                  <Form.Check type="radio" label="Phi nhị giới" name="gender" value="Phi nhị giới" checked={formData.gender === "Phi nhị giới"} onChange={handleChange} />
-                  <Form.Check type="radio" label="Giới tính khác" name="gender" value="Khác" checked={formData.gender === "Khác"} onChange={handleChange} />
-                  <Form.Check type="radio" label="Không muốn nêu cụ thể" name="gender" value="Không muốn nêu cụ thể" checked={formData.gender === "Không muốn nêu cụ thể"} onChange={handleChange} />
+                  <Form.Check type="radio" label="Khác" name="gender" value="Khác" checked={formData.gender === "Khác"} onChange={handleChange} />
+                  
                 </div>
                 {errors.gender && <p className="text-danger small">{errors.gender}</p>}
                 </Form.Group>

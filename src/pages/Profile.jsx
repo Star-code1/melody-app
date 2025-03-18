@@ -197,9 +197,7 @@ const Profile = () => {
           >
             <option value="Nam">Nam</option>
             <option value="Nữ">Nữ</option>
-            <option value="Phi nhị giới">Phi nhị giới</option>
-            <option value="Giới tính khác">Giới tính khác</option>
-            <option value="Không muốn nêu cụ thể">Không muốn nêu cụ thể</option>
+            <option value="Khác">Khác</option>
           </Form.Select>
         </Form.Group>
 
