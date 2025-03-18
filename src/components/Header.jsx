@@ -11,7 +11,7 @@ const Header = ({ isLoggedIn = false }) => {
   return (
     <div className="w-full p-4 flex items-center bg-gradient-to-b from-blue-900 to-teal-900 text-white">
       {/* Left side - Navigation arrows */}
-      <div className="flex gap-2 mr-20">
+      <div className="flex gap-2">
         <button className="bg-black bg-opacity-30 rounded-full p-2 hover:bg-opacity-50 transition">
           <ChevronLeft size={20} />
         </button>
