@@ -19,7 +19,9 @@ const Profile = () => {
   const [month, setMonth] = useState(userData?.birthDate?.month || "1");
   const [year, setYear] = useState(userData?.birthDate?.year || "2001");
   const [country, setCountry] = useState("Việt Nam");
-  const [shareData, setShareData] = useState(userData?.agreeMarketing || true);
+  const [shareData, setShareData] = useState(
+    userData?.agreeMarketing !== undefined ? userData.agreeMarketing : false
+  );
   const [error, setError] = useState("");
   
   const [oldPassword, setOldPassword] = useState("");

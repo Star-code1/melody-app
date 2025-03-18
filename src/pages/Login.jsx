@@ -7,37 +7,6 @@ import facebook_icon from "../assets/icons8-facebook-logo.svg";
 import { useNavigate } from "react-router-dom";
 import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
-function GoogleLoginButton({ onSuccess }) {
-    const login = useGoogleLogin({
-        onSuccess: (response) => {
-            console.log("Login Success:", response);
-            if (onSuccess) {
-                onSuccess(response);
-            }
-        },
-        onError: (error) => {
-            console.error("Login Failed:", error);
-        },
-    });
-
-    return (
-        <Button
-            variant="light"
-            className="w-100 mb-3"
-            style={{ borderRadius: "30px" }}
-            onClick={() => login()}
-        >
-            <img
-                src={google_icon}
-                alt="Google Logo"
-                width="20"
-                height="20"
-                className="me-2"
-            />
-            Đăng nhập bằng Google
-        </Button>
-    );
-}
 function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -68,69 +37,13 @@ function Login() {
             console.error("Lỗi đăng nhập:", error.response?.data || error.message);
             setError("Tên người dùng hoặc mật khẩu không đúng.");
         }
-    };
-    const handleGoogleLogin = async (response) => {
-        try {
-            // Kiểm tra xem có nhận được access_token từ response không
-            if (!response || !response.access_token) {
-                console.error("Google login error: No access token received");
-                alert("Không nhận được thông tin đăng nhập từ Google.");
-                return;
-            }
-    
-            const { access_token } = response;
-    
-            // Gửi yêu cầu tới Google API để lấy thông tin người dùng
-            const userInfoResponse = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
-                headers: {
-                    Authorization: `Bearer ${access_token}`,
-                },
-            });
-    
-            const { email, name } = userInfoResponse.data;  // Lấy thông tin email và name từ response
-    
-            if (!email) {
-                console.error("Google login error: No email found in the user data");
-                alert("Không tìm thấy email trong thông tin đăng nhập.");
-                return;
-            }
-    
-            const userData = { email, name };
-    
-            // Gửi dữ liệu người dùng lên server để kiểm tra và đăng nhập
-            const serverResponse = await axios.post("http://localhost:3000/api/users/google-login", userData);
-    
-            if (serverResponse.status === 200) {
-                localStorage.setItem("token", JSON.stringify(serverResponse.data.user)); 
-                alert("Đăng nhập thành công!");
-                navigate("/");  
-            } else {
-                console.error("Server login error:", serverResponse.data);
-                alert("Đăng nhập không thành công. Vui lòng thử lại.");
-            }
-        } catch (error) {
-            console.error("Google login error:", error);
-            alert("Đăng nhập bằng Google thất bại. Vui lòng thử lại.");
-        }
-    };
+    }
     return (
             <Container className="d-flex align-items-center justify-content-center bg-dark text-white" style={{ height: "700px",width: "500px",borderRadius: "10px" }}>
             <div className="w-100" style={{ maxWidth: "400px" }}>
                 <h2 className="text-center mb-4">Đăng nhập</h2>
                 <Form onSubmit={handleLogin}>
-                <Form.Group className="mb-3">
-                    <GoogleOAuthProvider clientId={CLIENT_ID}>
-                        <div className="d-flex justify-content-center mt-5">
-                            <GoogleLoginButton onSuccess={handleGoogleLogin}/>
-                        </div>
-                    </GoogleOAuthProvider>
-                </Form.Group>
-                <div className="position-relative my-4">
-                    <hr />
-                    <span className="position-absolute top-50 start-50 translate-middle px-3 bg-dark text-white">
-                        Hoặc
-                    </span>
-                </div>
+                
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                     <Form.Label className="text-start  w-100" style={{fontWeight: "bold"}}>Email hoặc tên người dùng</Form.Label>
                     <Form.Control
