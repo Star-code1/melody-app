@@ -21,7 +21,7 @@ function Home() {
     };
 
     return (
-        <div className="d-flex justify-content-between align-items-center p-3 bg-dark text-white">
+        <div className="d-flex justify-content-between align-items-center p-3 bg-dark text-white" >
             <h1>Home</h1>
             {user ? (
                 <AccountMenu />

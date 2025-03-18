@@ -60,7 +60,7 @@ function AccountMenuButton({ onProfileClick }) {
                 </Dropdown.Menu>
             </Dropdown>
             <PasswordResetModal showModal={showPasswordModal} setShowModal={setShowPasswordModal} />
-            <ProfileModal showModal={showProfileModal} setShowModal={ setShowProfileModal} />
+            <ProfileModal showModal={showProfileModal} setShowModal={setShowProfileModal} />
         </>
     );
 }
