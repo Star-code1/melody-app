@@ -5,7 +5,7 @@ import MySong from "../pages/MySong";
 
 function Page() {
   return (
-    <div className="p-1 vh-100">
+    <div className="vh-100">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/Search" element={<Search />} />

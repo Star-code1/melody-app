@@ -8,12 +8,12 @@ import Page from './components/Page';
 function App() {
   return (
     <BrowserRouter basename="/Melody"> 
-      <div className='bg-black container-fluid vw-100 vh-100'>
+      <div className='container-fluid vw-100 vh-100' >
         <Row>
-          <Col style={{ flex: "0.25" }}>
+          <Col style={{ flex: "0.25", padding: "0" }}>
             <Sidebar />
           </Col>
-          <Col>
+          <Col  style={{padding: "0" }}>
             <Page />
           </Col>
         </Row>

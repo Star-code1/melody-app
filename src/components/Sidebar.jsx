@@ -1,18 +1,26 @@
 import React, { useState } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, Toast, ToastContainer } from "react-bootstrap";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { AiFillHome } from "react-icons/ai";
 import { FaSearch } from "react-icons/fa";
 import { FaMusic } from "react-icons/fa6";
 import { FaList } from "react-icons/fa";
+import { BsFillMusicPlayerFill, BsMusicNote } from "react-icons/bs";
+import { BiImage } from "react-icons/bi";
+import "./Sidebar.scss"; // Make sure to create this SCSS file
+
 function Sidebar() {
   const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  
   const [songData, setSongData] = useState({
     title: "",
     description: "",
-    author: "",
-    musicFile: null,
+    artist: "",
+    audioFile: null,
     imageFile: null,
   });
 
@@ -26,161 +34,189 @@ function Sidebar() {
 
   const handleFileChange = (e) => {
     const { name, files } = e.target;
-    setSongData({ ...songData, [name]: files[0] });
+    if (files && files[0]) {
+      setSongData({ ...songData, [name]: files[0] });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    
     const formData = new FormData();
     formData.append("title", songData.title);
     formData.append("description", songData.description);
-    formData.append("artist", songData.author);  // Đổi từ author -> artist
-    formData.append("audioFile", songData.musicFile);  // Đổi từ musicFile -> audioFile
+    formData.append("artist", songData.artist);
+    formData.append("audioFile", songData.audioFile);
     formData.append("imageFile", songData.imageFile);
 
     try {
-        await axios.post("http://localhost:5000/api/songs/upload", formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-        });
-        alert("Bài hát đã được thêm!");
-        handleClose();
+      await axios.post("http://localhost:5000/api/songs/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setToastMessage("Bài hát đã được thêm thành công!");
+      setShowToast(true);
+      handleClose();
+      // Reset form
+      setSongData({
+        title: "",
+        description: "",
+        artist: "",
+        audioFile: null,
+        imageFile: null,
+      });
     } catch (error) {
-        console.error("Lỗi khi thêm bài hát", error);
+      console.error("Lỗi khi thêm bài hát", error);
+      setToastMessage("Có lỗi xảy ra khi thêm bài hát!");
+      setShowToast(true);
+    } finally {
+      setLoading(false);
     }
-
-};
-
+  };
 
   return (
-    <div className="">
-      <div className="container bg-dark w-100 rounded mt-2 py-1">
-        <div className="my-3 fs-5 py-3 px-3 d-flex align-items-center text-white"  style={{ cursor: "pointer" }} 
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#333"}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-          onMouseDown={(e) => e.currentTarget.style.backgroundColor = "#555"}
-          onMouseUp={(e) => e.currentTarget.style.backgroundColor = "#333"}>
-          <Link className="w-100 text-decoration-none text-white" to="/">
-            <AiFillHome className="me-3" />
-            <span>Trang chủ</span>
-          </Link>
-        </div>
-        <div className="my-3 fs-5 py-3 px-3 d-flex align-items-center text-white" style={{ cursor: "pointer" }} 
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#333"}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-          onMouseDown={(e) => e.currentTarget.style.backgroundColor = "#555"}
-          onMouseUp={(e) => e.currentTarget.style.backgroundColor = "#333"}>
-           <Link className="w-100 text-decoration-none text-white" to="/Search">
-            <FaSearch className="me-3" />
-            <span>Tìm kiếm</span>
-          </Link>
-        </div>
+    <div className="sidebar">
+      <div className="sidebar-section">
+        <SidebarItem to="/" icon={<AiFillHome />} text="Trang chủ" />
+        <SidebarItem to="/Search" icon={<FaSearch />} text="Tìm kiếm" />
       </div>
-      <div className="container bg-dark w-100 rounded mt-2 py-1 ">
-        <div className="my-3 fs-5 py-3 px-3 d-flex align-items-center text-white" onClick={handleShow}style={{ cursor: "pointer" }} 
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#333"}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-          onMouseDown={(e) => e.currentTarget.style.backgroundColor = "#555"}
-          onMouseUp={(e) => e.currentTarget.style.backgroundColor = "#333"}>
-          <Link className="w-100 text-decoration-none text-white" >
-            <FaMusic className="me-3" />
-            <span>Thêm bài hát </span>
-          </Link>
-        </div>
-        <div className="my-3 fs-5 py-3 px-3 d-flex align-items-center text-white" style={{ cursor: "pointer" }} 
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#333"}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-          onMouseDown={(e) => e.currentTarget.style.backgroundColor = "#555"}
-          onMouseUp={(e) => e.currentTarget.style.backgroundColor = "#333"}>
-          <Link className="w-100 text-decoration-none text-white" to="/MySong">
-            <FaList className="me-3" />
-            <span>Nhạc của tôi</span>
-          </Link>
-        </div>
-      </div>
-
       
-      <Modal show={show} onHide={handleClose} centered>
-  <Modal.Header closeButton className="bg-dark text-white border-0">
-    <Modal.Title>Thêm Bài Hát</Modal.Title>
-  </Modal.Header>
-  <Modal.Body className="bg-dark text-white">
-    <p className="text-center text-secondary">Upload an mp3 file</p>
-    <Form onSubmit={handleSubmit}>
-      <Form.Group className="mb-3">
-        <Form.Control
-          type="text"
-          name="title"
-          placeholder="Tên bài hát"
-          onChange={handleChange}
-          required
-          className="bg-secondary text-white border-0"
-        />
-      </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Control
-          as="textarea"
-          name="description"
-          placeholder="Mô tả"
-          rows={3}
-          onChange={handleChange}
-          className="bg-secondary text-white border-0"
-        />
-      </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Control
-          type="text"
-          name="author"
-          placeholder="Tác giả"
-          onChange={handleChange}
-          required
-          className="bg-secondary text-white border-0"
-        />
-      </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Label>Chọn file nhạc</Form.Label>
-        <Form.Control
-          type="file"
-          name="musicFile"
-          accept="audio/*"
-          onChange={handleFileChange}
-          required
-          className="bg-secondary text-white border-0"
-        />
-      </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Label>Chọn ảnh bìa</Form.Label>
-        <Form.Control
-          type="file"
-          name="imageFile"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="bg-secondary text-white border-0"
-        />
-      </Form.Group>
-      <div className="d-flex justify-content-between">
-        <Button
-          variant="secondary"
-          onClick={handleClose}
-          className="px-4 py-2 border-0"
-        >
-          Hủy
-        </Button>
-        <Button
-          type="submit"
-          className="px-4 py-2"
-          style={{
-            backgroundColor: "#1DB954",
-            border: "none",
-            fontSize: "18px",
-          }}
-        >
-          Thêm bài hát
-        </Button>
+      <div className="sidebar-section">
+        <SidebarItem icon={<FaMusic />} text="Thêm bài hát" onClick={handleShow} />
+        <SidebarItem to="/MySong" icon={<FaList />} text="Nhạc của tôi" />
       </div>
-    </Form>
-  </Modal.Body>
-</Modal>
 
+      {/* Music Upload Modal */}
+      <Modal show={show} onHide={handleClose} centered className="music-upload-modal">
+        <Modal.Header closeButton className="modal-header">
+          <Modal.Title>
+            <BsFillMusicPlayerFill className="me-2" />
+            Thêm bài hát
+            <BsFillMusicPlayerFill className="ms-2" />
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="modal-body">
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-4">
+              <Form.Control
+                type="text"
+                name="title"
+                placeholder="Tên bài hát"
+                value={songData.title}
+                onChange={handleChange}
+                required
+                className="form-input"
+              />
+            </Form.Group>
+            
+            <Form.Group className="mb-4">
+              <Form.Control
+                as="textarea"
+                name="description"
+                placeholder="Mô tả"
+                value={songData.description}
+                rows={3}
+                onChange={handleChange}
+                className="form-input"
+              />
+            </Form.Group>
+            
+            <Form.Group className="mb-4">
+              <Form.Control
+                type="text"
+                name="artist"
+                placeholder="Tác giả"
+                value={songData.artist}
+                onChange={handleChange}
+                required
+                className="form-input"
+              />
+            </Form.Group>
+            
+            <Form.Group className="mb-4">
+              <Form.Label className="form-label">
+                <BsMusicNote className="me-2" />
+                Chọn file nhạc
+              </Form.Label>
+              <Form.Control
+                type="file"
+                name="audioFile"
+                accept="audio/*"
+                onChange={handleFileChange}
+                required
+                className="form-file-input"
+              />
+            </Form.Group>
+            
+            <Form.Group className="mb-4">
+              <Form.Label className="form-label">
+                <BiImage className="me-2" />
+                Chọn ảnh bìa
+              </Form.Label>
+              <Form.Control
+                type="file"
+                name="imageFile"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="form-file-input"
+              />
+            </Form.Group>
+            
+            <div className="modal-actions">
+              <Button
+                variant="outline-light"
+                onClick={handleClose}
+                className="btn-cancel"
+                disabled={loading}
+              >
+                Hủy
+              </Button>
+              <Button
+                type="submit"
+                className="btn-submit"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Đang xử lý...
+                  </>
+                ) : (
+                  "Thêm bài hát"
+                )}
+              </Button>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal>
+      
+      {/* Toast notification */}
+      <ToastContainer position="top-end" className="p-3" style={{ zIndex: 1070 }}>
+        <Toast 
+          onClose={() => setShowToast(false)} 
+          show={showToast} 
+          delay={3000} 
+          autohide
+          bg={toastMessage.includes("lỗi") ? "danger" : "success"}
+        >
+          <Toast.Header>
+            <strong className="me-auto">Thông báo</strong>
+          </Toast.Header>
+          <Toast.Body className="text-white">{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
+    </div>
+  );
+}
+
+// Helper component for sidebar items
+function SidebarItem({ to, icon, text, onClick }) {
+  return (
+    <div className="sidebar-item" onClick={onClick}>
+      <Link className="sidebar-link" to={to || "#"}>
+        <span className="sidebar-icon">{icon}</span>
+        <span>{text}</span>
+      </Link>
     </div>
   );
 }
