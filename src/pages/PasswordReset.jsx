@@ -39,7 +39,7 @@ const PasswordReset = () => {
     const handleResetPassword = async () => {
         setError(""); // Xóa lỗi trước khi kiểm tra
     
-        if (!oldPassword || !password || !confirmPassword) {
+        if (!password || !confirmPassword) {
             setError("Vui lòng nhập đầy đủ thông tin.");
             return;
         }
@@ -65,9 +65,8 @@ const PasswordReset = () => {
         }
     
         try {
-            const response = await axios.post("http://localhost:5000/api/users/change-password", {
+            const response = await axios.post("http://localhost:5000/api/users/forgot-password", {
                 email,
-                oldPassword,
                 newPassword: password
             });
     
@@ -133,25 +132,7 @@ const PasswordReset = () => {
             </div>
 
             <Form>
-                <Form.Group className="mb-3 position-relative">
-                    <Form.Label>Mật khẩu cũ</Form.Label>
-                    <div className="position-relative">
-                        <Form.Control
-                            type={showOldPassword ? "text" : "password"}
-                            placeholder="Nhập mật khẩu cũ"
-                            value={oldPassword}
-                            onChange={(e) => setOldPassword(e.target.value)}
-                            className="p-3 bg-dark text-white border-0"
-                        />
-                        <span
-                            className="position-absolute top-50 end-0 translate-middle-y me-3"
-                            style={{ cursor: "pointer" }}
-                            onClick={toggleOldPasswordVisibility}
-                        >
-                            {showOldPassword ? <FaEyeSlash color="white" /> : <FaEye color="white" />}
-                        </span>
-                    </div>
-                </Form.Group>
+                
                 <Form.Group className="mb-3 position-relative">
                 <Form.Label>Mật khẩu mới</Form.Label>
                 <div className="position-relative">

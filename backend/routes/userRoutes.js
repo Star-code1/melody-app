@@ -90,6 +90,24 @@ router.post("/change-password", async (req, res) => {
     }
 });
 
+router.post("/forgot-password", async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: "Email không tồn tại." });
+        }
+
+
+        user.password = await bcrypt.hash(newPassword, 10);
+        await user.save();
+        res.status(200).json({ message: "Đổi mật khẩu thành công!" });
+    } catch (error) {
+        console.error("Lỗi server khi đổi mật khẩu:", error);
+        res.status(500).json({ message: "Lỗi server", error });
+    }
+});
+
 // ✅ API cập nhật hồ sơ người dùng
 router.put("/update-profile", async (req, res) => {
     try {
