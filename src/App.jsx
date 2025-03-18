@@ -1,25 +1,25 @@
 import './App.css'
 import 'bootstrap/dist/css/bootstrap.css';
-import {Row,Col} from 'react-bootstrap'
+import { BrowserRouter } from 'react-router-dom'; 
+import { Row, Col } from 'react-bootstrap';
 import Sidebar from './components/Sidebar';
 import Page from './components/Page';
 
-
 function App() {
   return (
-    <>
-      <div className='bg-black container-fluid p-3'>
+    <BrowserRouter basename="/Melody"> 
+      <div className='bg-black container-fluid vw-100 vh-100'>
         <Row>
-          <Col md={2}>
-            <Sidebar></Sidebar>
+          <Col style={{ flex: "0.25" }}>
+            <Sidebar />
           </Col>
           <Col>
-            <Page></Page>
+            <Page />
           </Col>
         </Row>
       </div>
-    </>
-  )
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;

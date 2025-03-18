@@ -1,10 +1,13 @@
 {
-  "name": "melody-app",
+  "name": "Melody",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "start": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "nodemon backend/server.js",
+    "frontend": "vite",
+    "dev": "npm start",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -12,6 +15,7 @@
   "dependencies": {
     "axios": "^1.8.3",
     "bootstrap": "^5.3.3",
+    "Melody": "file:",
     "melody-app": "file:",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
@@ -25,6 +29,7 @@
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.2",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",

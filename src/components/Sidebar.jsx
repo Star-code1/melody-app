@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import { AiFillHome } from "react-icons/ai";
 import { FaSearch } from "react-icons/fa";
 import { FaMusic } from "react-icons/fa6";
@@ -46,59 +47,140 @@ function Sidebar() {
     } catch (error) {
         console.error("Lỗi khi thêm bài hát", error);
     }
+
 };
 
 
   return (
-    <div className="container bg-dark w-100 rounded mt-2">
-      <div className="mb-1 fs-5 mt-1 me-3" onClick={handleShow} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "20px", padding: "10px", color: "white" }}>
-        <AiFillHome />
-        <span>Home</span>
+    <div className="">
+      <div className="container bg-dark w-100 rounded mt-2 py-1">
+        <div className="my-3 fs-5 py-3 px-3 d-flex align-items-center text-white"  style={{ cursor: "pointer" }} 
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#333"}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+          onMouseDown={(e) => e.currentTarget.style.backgroundColor = "#555"}
+          onMouseUp={(e) => e.currentTarget.style.backgroundColor = "#333"}>
+          <Link className="w-100 text-decoration-none text-white" to="/">
+            <AiFillHome className="me-3" />
+            <span>Trang chủ</span>
+          </Link>
+        </div>
+        <div className="my-3 fs-5 py-3 px-3 d-flex align-items-center text-white" style={{ cursor: "pointer" }} 
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#333"}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+          onMouseDown={(e) => e.currentTarget.style.backgroundColor = "#555"}
+          onMouseUp={(e) => e.currentTarget.style.backgroundColor = "#333"}>
+           <Link className="w-100 text-decoration-none text-white" to="/Search">
+            <FaSearch className="me-3" />
+            <span>Tìm kiếm</span>
+          </Link>
+        </div>
       </div>
-      <div className="mb-1 fs-5 mt-3 me-3" onClick={handleShow} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "20px", padding: "10px", color: "white" }}>
-        <FaSearch/>
-        <span>Search</span>
-      </div>
-      <div className="mb-1 fs-5 mt-3 me-3" onClick={handleShow} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "20px", padding: "10px", color: "white" }}>
-        <FaMusic/>
-        <span>Add Song</span>
-      </div>
-      <div className="mb-1 fs-5 mt-3 me-3" onClick={handleShow} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "20px", padding: "10px", color: "white" }}>
-        <FaList/>
-        <span>My Song</span>
+      <div className="container bg-dark w-100 rounded mt-2 py-1 ">
+        <div className="my-3 fs-5 py-3 px-3 d-flex align-items-center text-white" onClick={handleShow}style={{ cursor: "pointer" }} 
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#333"}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+          onMouseDown={(e) => e.currentTarget.style.backgroundColor = "#555"}
+          onMouseUp={(e) => e.currentTarget.style.backgroundColor = "#333"}>
+          <Link className="w-100 text-decoration-none text-white" >
+            <FaMusic className="me-3" />
+            <span>Thêm bài hát </span>
+          </Link>
+        </div>
+        <div className="my-3 fs-5 py-3 px-3 d-flex align-items-center text-white" style={{ cursor: "pointer" }} 
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#333"}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+          onMouseDown={(e) => e.currentTarget.style.backgroundColor = "#555"}
+          onMouseUp={(e) => e.currentTarget.style.backgroundColor = "#333"}>
+          <Link className="w-100 text-decoration-none text-white" to="/MySong">
+            <FaList className="me-3" />
+            <span>Nhạc của tôi</span>
+          </Link>
+        </div>
       </div>
 
+      
       <Modal show={show} onHide={handleClose} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Thêm Bài Hát</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
-              <Form.Label>Tên bài hát</Form.Label>
-              <Form.Control type="text" name="title" onChange={handleChange} required />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Mô tả</Form.Label>
-              <Form.Control as="textarea" name="description" rows={3} onChange={handleChange} />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Tác giả</Form.Label>
-              <Form.Control type="text" name="author" onChange={handleChange} required />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>File nhạc</Form.Label>
-              <Form.Control type="file" name="musicFile" accept="audio/*" onChange={handleFileChange} required />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Ảnh bìa</Form.Label>
-              <Form.Control type="file" name="imageFile" accept="image/*" onChange={handleFileChange} />
-            </Form.Group>
-            <Button variant="secondary" onClick={handleClose}>Hủy</Button>
-            <Button variant="primary" type="submit">Thêm bài hát</Button>
-          </Form>
-        </Modal.Body>
-      </Modal>
+  <Modal.Header closeButton className="bg-dark text-white border-0">
+    <Modal.Title>Thêm Bài Hát</Modal.Title>
+  </Modal.Header>
+  <Modal.Body className="bg-dark text-white">
+    <p className="text-center text-secondary">Upload an mp3 file</p>
+    <Form onSubmit={handleSubmit}>
+      <Form.Group className="mb-3">
+        <Form.Control
+          type="text"
+          name="title"
+          placeholder="Tên bài hát"
+          onChange={handleChange}
+          required
+          className="bg-secondary text-white border-0"
+        />
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Control
+          as="textarea"
+          name="description"
+          placeholder="Mô tả"
+          rows={3}
+          onChange={handleChange}
+          className="bg-secondary text-white border-0"
+        />
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Control
+          type="text"
+          name="author"
+          placeholder="Tác giả"
+          onChange={handleChange}
+          required
+          className="bg-secondary text-white border-0"
+        />
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Chọn file nhạc</Form.Label>
+        <Form.Control
+          type="file"
+          name="musicFile"
+          accept="audio/*"
+          onChange={handleFileChange}
+          required
+          className="bg-secondary text-white border-0"
+        />
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Chọn ảnh bìa</Form.Label>
+        <Form.Control
+          type="file"
+          name="imageFile"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="bg-secondary text-white border-0"
+        />
+      </Form.Group>
+      <div className="d-flex justify-content-between">
+        <Button
+          variant="secondary"
+          onClick={handleClose}
+          className="px-4 py-2 border-0"
+        >
+          Hủy
+        </Button>
+        <Button
+          type="submit"
+          className="px-4 py-2"
+          style={{
+            backgroundColor: "#1DB954",
+            border: "none",
+            fontSize: "18px",
+          }}
+        >
+          Thêm bài hát
+        </Button>
+      </div>
+    </Form>
+  </Modal.Body>
+</Modal>
+
     </div>
   );
 }

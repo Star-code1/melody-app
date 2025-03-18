@@ -5,11 +5,11 @@ import MySong from "../pages/MySong";
 
 function Page() {
   return (
-    <div className="p-4 w-full">
+    <div className="p-1 vh-100">
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/mysong" element={<MySong />} />
+        <Route path="/Search" element={<Search />} />
+        <Route path="/MySong" element={<MySong />} />
       </Routes>
     </div>
   );
