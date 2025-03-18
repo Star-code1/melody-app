@@ -14,7 +14,10 @@ const UserSchema = new mongoose.Schema({
     agreeSharing: { type: Boolean, default: false },
 
     // Mảng chứa danh sách bài hát của người dùng
-    songs: { type: mongoose.Schema.Types.Mixed, default: [] } // Cho phép lưu bất kỳ dữ liệu gì
+    songs: { type: mongoose.Schema.Types.Mixed, default: [] }, // Cho phép lưu bất kỳ dữ liệu gì
+
+    // Mảng chứa danh sách bài hát yêu thích của người dùng
+    favoriteSongs: { type: mongoose.Schema.Types.Mixed, default: [] }, // Cho phép lưu bất kỳ dữ liệu gì
 });
 
 module.exports = mongoose.model("User", UserSchema);

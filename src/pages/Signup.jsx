@@ -214,7 +214,9 @@ function Signup() {
                 gender: formData.gender,
                 agreeMarketing: Boolean(formData.agreeMarketing),
                 agreeSharing: Boolean(formData.agreeSharing),
-                songs: []
+                songs: [],
+                favoriteSongs: [],
+                  
             };
 
             console.log("Dữ liệu gửi lên server:", userData);

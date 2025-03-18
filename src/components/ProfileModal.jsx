@@ -19,7 +19,6 @@ const ProfileModal = ({ showModal, setShowModal }) => {
   const [shareData, setShareData] = useState(
     userData?.agreeMarketing !== undefined ? userData.agreeMarketing : false
   );
-  console.log("Dữ liệu người dùng:", userData);
 
   useEffect(() => {
     if (!token) {
@@ -134,7 +133,12 @@ const ProfileModal = ({ showModal, setShowModal }) => {
                   min="1900"
                   max="2025"
                   value={year}
-                  onChange={(e) => setYear(e.target.value)}
+                  onChange={(e) => {
+                    const newValue = parseInt(e.target.value, 10);
+                    if (!isNaN(newValue) && newValue >= 1900 && newValue <= 2025) {
+                      setYear(newValue);
+                    }
+                  }}
                   className="bg-dark text-white border-0 p-3 rounded-3"
                 />
               </Col>
