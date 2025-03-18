@@ -54,7 +54,7 @@ function PasswordResetModal({ showModal, setShowModal }){
         }
 
         try {
-            const response = await axios.post("http://localhost:3000/api/users/change-password", {
+            const response = await axios.post("http://localhost:5000/api/users/change-password", {
                 email: email,
                 oldPassword,
                 newPassword: password

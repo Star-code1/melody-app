@@ -75,7 +75,7 @@ function Signup() {
     }
     
     try {
-        const response = await axios.get(`http://localhost:3000/api/users/check-email?email=${email}`);
+        const response = await axios.get(`http://localhost:5000/api/users/check-email?email=${email}`);
         if (response.data.exists) {
             return 1;
         }
@@ -220,7 +220,7 @@ function Signup() {
             console.log("Dữ liệu gửi lên server:", userData);
 
             // Gửi dữ liệu lên backend
-            const response = await axios.post("http://localhost:3000/api/users", userData);
+            const response = await axios.post("http://localhost:5000/api/users", userData);
 
             if (response.status === 201) {
                 const token = response.data;
