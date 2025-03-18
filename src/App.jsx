@@ -7,11 +7,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Form, Button, Navbar, Nav } from "react-bootstrap";
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import Phone from './pages/Phone';
-import Signup2 from './pages/Signup2';
 import PasswordReset from './pages/PasswordReset';
 import Home from './pages/Home';
-import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -20,10 +17,7 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/Login" element={<Login />} />
       <Route path="/Signup" element={<Signup />} />
-      <Route path="/Signup2" element={<Signup2 />} />
-      <Route path="/Phone" element={<Phone />} />
       <Route path="/PasswordReset" element={<PasswordReset />} />
-      <Route path="/Profile" element={<Profile />} />
     </Routes>
   </Router>
   );

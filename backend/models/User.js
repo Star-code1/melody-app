@@ -12,6 +12,9 @@ const UserSchema = new mongoose.Schema({
     gender: { type: String, default: "unknown" },
     agreeMarketing: { type: Boolean, default: false },
     agreeSharing: { type: Boolean, default: false },
+
+    // Mảng chứa danh sách bài hát của người dùng
+    songs: { type: mongoose.Schema.Types.Mixed, default: [] } // Cho phép lưu bất kỳ dữ liệu gì
 });
 
 module.exports = mongoose.model("User", UserSchema);

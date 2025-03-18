@@ -213,7 +213,8 @@ function Signup() {
                 },
                 gender: formData.gender,
                 agreeMarketing: Boolean(formData.agreeMarketing),
-                agreeSharing: Boolean(formData.agreeSharing)
+                agreeSharing: Boolean(formData.agreeSharing),
+                songs: []
             };
 
             console.log("Dữ liệu gửi lên server:", userData);
@@ -287,20 +288,7 @@ function Signup() {
           >
             Tiếp theo
           </Button>
-          <div className="position-relative my-4">
-                <hr />
-                <span className="position-absolute top-50 start-50 translate-middle px-3 bg-dark text-white">
-                    Hoặc
-                </span>
-            </div>
-          <Form.Group className="mb-3">
-            <GoogleOAuthProvider clientId={CLIENT_ID}>
-                <div className="d-flex justify-content-center mt-5">
-                  <GoogleSignupButton onSuccess={handleGoogleLogin}/>
-                </div>
-            </GoogleOAuthProvider>
-            
-          </Form.Group>
+          
           <p className="text-white-50 text-center mt-3">Bạn đã có tài khoản? <span
             style={{ color: "white", textDecoration: "underline", cursor: "pointer" }}
             onMouseOver={(e) => (e.target.style.color = "#1ed760")}

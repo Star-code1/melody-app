@@ -1,28 +1,32 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import AccountMenu from "../components/AccountMenuButton"; 
+import ProfileModal from "../components/ProfileModal";
 
 function Home() {
-    const navigate = useNavigate();
-    const token = localStorage.getItem("token"); // Kiểm tra token đăng nhập
+    const [showProfileModal, setShowProfileModal] = useState(false);
+    const [user, setUser] = useState(null);
 
-    // Hàm xử lý đăng xuất
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        navigate("/login"); // Chuyển hướng về trang đăng nhập
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            const storedUser = JSON.parse(localStorage.getItem("user")) || {};
+            setUser(storedUser);
+        }
+    }, []);
+
+    const handleSaveProfile = (updatedUser) => {
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        setUser(updatedUser);
     };
 
     return (
-        <div>
+        <div className="d-flex justify-content-between align-items-center p-3 bg-dark text-white">
             <h1>Home</h1>
-            {token ? (
-                <div>
-                    <Link to="/profile">Trang cá nhân</Link>
-                    <button onClick={handleLogout} style={{ marginLeft: "10px" }}>
-                        Đăng xuất
-                    </button>
-                </div>
+            {user ? (
+                <AccountMenu />
             ) : (
-                <Link to="/login">Đăng nhập</Link>
+                <Link to="/login" className="btn btn-primary">Đăng nhập</Link>
             )}
         </div>
     );
