@@ -1,107 +1,59 @@
-import React, { useState } from "react";
-import {
-  Search,
-  User,
-  Settings,
-  LogOut,
-  Heart,
-  Clock,
-  Download,
-  Sliders,
-} from "lucide-react"; // import logo
+import React, { useState } from 'react';
+import { ChevronLeft, ChevronRight, User } from 'lucide-react';
 
-const Header = () => {
-  const [showUserMenu, setShowUserMenu] = useState(false);
+const Header = ({ isLoggedIn = false }) => {
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const toggleUserMenu = () => {
-    setShowUserMenu(!showUserMenu);
+    setIsUserMenuOpen(!isUserMenuOpen);
   };
 
   return (
-    <header className="flex items-center justify-between px-6 py-4 bg-black text-white">
-      {/* Logo */}
-      <div className="flex items-center">
-        <div className="text-2xl font-bold text-green-500">Logo</div>
-        <img src="" alt="" />
-      </div>
-
-      {/* Search Bar */}
-      <div className="flex-1 max-w-md mx-8">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Tìm kiếm bài hát, nghệ sĩ, album..."
-            className="w-full py-2 pl-10 pr-4 rounded-full bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-          <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-        </div>
-      </div>
-
-      {/* User Icon */}
-      <div className="relative">
-        <button
-          className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-800 hover:bg-gray-700"
-          onClick={toggleUserMenu}
-        >
-          <Sliders className="h-5 w-5 text-white fill-white" />
+    <div className="w-full p-4 flex items-center bg-gradient-to-b from-blue-900 to-teal-900 text-white">
+      {/* Left side - Navigation arrows */}
+      <div className="flex gap-2">
+        <button className="bg-black bg-opacity-30 rounded-full p-2 hover:bg-opacity-50 transition">
+          <ChevronLeft size={20} />
         </button>
-        {/* List menu */}
-        {showUserMenu && (
-          <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5">
-            <div className="py-1" role="menu">
-              <a
-                href="#"
-                className="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                role="menuitem"
-              >
-                <User className="mr-2 h-4 w-4" />
-                Hồ sơ cá nhân
-              </a>
-              <a
-                href="#"
-                className="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                role="menuitem"
-              >
-                <Heart className="mr-2 h-4 w-4" />
-                Bài hát yêu thích
-              </a>
-              <a
-                href="#"
-                className="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                role="menuitem"
-              >
-                <Clock className="mr-2 h-4 w-4" />
-                Nghe gần đây
-              </a>
-              <a
-                href="#"
-                className="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                role="menuitem"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Tải xuống
-              </a>
-              <a
-                href="#"
-                className="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                role="menuitem"
-              >
-                <Settings className="mr-2 h-4 w-4" />
-                Cài đặt
-              </a>
-              <a
-                href="#"
-                className="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                role="menuitem"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Đăng xuất
-              </a>
-            </div>
+        <button className="bg-black bg-opacity-30 rounded-full p-2 hover:bg-opacity-50 transition">
+          <ChevronRight size={20} />
+        </button>
+      </div>
+
+
+      {/* Right side - Authentication */}
+      <div className="flex items-center">
+        {isLoggedIn ? (
+          <div className="relative">
+            <button 
+              onClick={toggleUserMenu}
+              className="bg-black bg-opacity-30 rounded-full p-2 hover:bg-opacity-50 transition"
+            >
+              <User size={20} />
+            </button>
+
+            {/* User dropdown menu */}
+            {isUserMenuOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-zinc-800 rounded shadow-lg py-1 z-10">
+                <a href="#profile" className="block px-4 py-2 hover:bg-zinc-700">Hồ sơ</a>
+                <a href="#settings" className="block px-4 py-2 hover:bg-zinc-700">Cài đặt</a>
+                <hr className="border-zinc-700 my-1" />
+                <a href="#logout" className="block px-4 py-2 hover:bg-zinc-700">Đăng xuất</a>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex gap-3">
+            <button className="px-4 py-2 rounded-full bg-transparent border border-white text-white hover:bg-white hover:bg-opacity-10 transition">
+              Đăng ký
+            </button>
+            <button className="px-4 py-2 rounded-full bg-white text-black font-medium hover:scale-105 transition">
+              Đăng nhập
+            </button>
           </div>
         )}
       </div>
-    </header>
+    </div>
   );
 };
 
