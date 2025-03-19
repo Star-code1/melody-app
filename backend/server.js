@@ -5,6 +5,7 @@ console.log("🔍 MONGO_URI:", process.env.MONGO_URI); // Debug xem biến có b
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const userRoutes = require("./routes/userRoutes");
 const songRoutes = require("./routes/songRoutes");
 
 const app = express();
@@ -22,6 +23,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use("/api/users", userRoutes);
 app.use("/api/songs", songRoutes);
 
 app.listen(PORT, () => console.log(`🚀 Server is running on port ${PORT}`));
