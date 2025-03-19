@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Heart, Search, Disc, TrendingUp, Play, Clock, Ellipsis } from 'lucide-react';
-import 'bootstrap/dist/css/bootstrap.min.css'
+import { Heart, Search, Disc, TrendingUp, Play, Clock } from 'lucide-react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 const SearchPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [favorites, setFavorites] = useState([3]);
@@ -94,8 +95,8 @@ const SearchPage = () => {
   };
 
   return (
-    <div className="min-vh-100 bg-dark text-white p-4">
-      <div className="container py-4">
+    <div className="search-page-root">
+      <div className="search-page-container">
         <div className="d-flex align-items-center mb-4">
           <Disc size={36} className="text-danger me-3" />
           <h1 className="display-5 fw-bold" style={customStyles.gradientText}>
@@ -225,157 +226,232 @@ const SearchPage = () => {
           </div>
         </div>
         
-        <div className="mt-5">
+        <div className="mt-5 search-results-section">
           <h2 className="fs-2 fw-bold mb-4">Kết quả tìm kiếm</h2>
-          <table className="table table-dark table-borderless">
-            <thead>
-              <tr className="border-bottom border-secondary border-opacity-25 text-white-50">
-                <th className="ps-3 fw-bold fs-5 text-start">#</th>
-                <th className="fw-bold fs-5 text-start">Tiêu đề</th>
-                <th className="fw-bold fs-5 text-start">Album</th>
-                <th className="text-end pe-4">
-                  <Clock size={24} />
-                </th>
-                <th className="text-end pe-2 w-auto"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {musicItems.map((item, index) => {
-                const isFavorite = favorites.includes(item.id);
-                
-                return (
-                  <tr
-                    key={item.id}
-                    className="border-bottom border-secondary border-opacity-10"
-                    style={{
-                      ...customStyles.searchResult,
-                      transition: 'all 0.3s ease'
-                    }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.background = 'linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(220, 38, 38, 0.2))';
-                      e.currentTarget.style.borderLeft = '4px solid #dc2626';
-                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.15)';
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.background = '';
-                      e.currentTarget.style.borderLeft = '';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                  >
-                    <td className="ps-3 py-4 text-center position-relative">
-                      <span className="text-white-50 song-number">{index + 1}</span>
-                    </td>
-                    <td className="py-3">
-                      <div className="d-flex align-items-center">
-                        <div className="position-relative me-3">
-                          <div className={`position-absolute top-0 bottom-0 start-0 end-0 rounded-3 ${isFavorite ? 'shadow-danger' : ''}`}></div>
-                          <img 
-                            src={item.coverArt} 
-                            alt={item.title} 
-                            className="rounded-3 object-fit-cover border border-secondary" 
-                            style={{
-                              width: '64px',
-                              height: '64px',
-                              transition: 'all 0.3s ease'
-                            }}
-                            onMouseOver={(e) => {
-                              e.currentTarget.style.transform = 'scale(1.05)';
-                              e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
-                              e.currentTarget.style.border = '1px solid rgba(220, 38, 38, 0.5)';
-                            }}
-                            onMouseOut={(e) => {
-                              e.currentTarget.style.transform = 'scale(1)';
-                              e.currentTarget.style.boxShadow = 'none';
-                              e.currentTarget.style.border = '1px solid #343a40';
-                            }}
-                          />
-                          <div className="position-absolute top-0 bottom-0 start-0 end-0 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center rounded-3 cover-overlay"
-                               style={{opacity: 0, transition: 'all 0.3s ease'}}>
-                            <div className="bg-danger rounded-circle d-flex align-items-center justify-content-center play-button-mini"
-                                 style={{
-                                   width: '32px',
-                                   height: '32px',
-                                   transform: 'scale(0.9)',
-                                   transition: 'all 0.3s ease',
-                                   boxShadow: '0 4px 12px rgba(220, 38, 38, 0.2)'
-                                 }}>
-                              <Play size={16} fill="white" style={{marginLeft: '2px'}} />
+          <div className="table-responsive">
+            <table className="table table-dark table-borderless">
+              <thead>
+                <tr className="border-bottom border-secondary border-opacity-25 text-white-50">
+                  <th className="ps-3 fw-bold fs-5 text-start">#</th>
+                  <th className="fw-bold fs-5 text-start">Tiêu đề</th>
+                  <th className="fw-bold fs-5 text-start">Album</th>
+                  <th className="text-end pe-4">
+                    <Clock size={24} />
+                  </th>
+                  <th className="text-end pe-2 w-auto"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {musicItems.map((item, index) => {
+                  const isFavorite = favorites.includes(item.id);
+                  
+                  return (
+                    <tr
+                      key={item.id}
+                      className="border-bottom border-secondary border-opacity-10"
+                      style={{
+                        ...customStyles.searchResult,
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = 'linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(220, 38, 38, 0.2))';
+                        e.currentTarget.style.borderLeft = '4px solid #dc2626';
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.15)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = '';
+                        e.currentTarget.style.borderLeft = '';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
+                    >
+                      <td className="ps-3 py-4 text-center position-relative">
+                        <span className="text-white-50 song-number">{index + 1}</span>
+                      </td>
+                      <td className="py-3">
+                        <div className="d-flex align-items-center">
+                          <div className="position-relative me-3">
+                            <div className={`position-absolute top-0 bottom-0 start-0 end-0 rounded-3 ${isFavorite ? 'shadow-danger' : ''}`}></div>
+                            <img 
+                              src={item.coverArt} 
+                              alt={item.title} 
+                              className="rounded-3 object-fit-cover border border-secondary" 
+                              style={{
+                                width: '64px',
+                                height: '64px',
+                                transition: 'all 0.3s ease'
+                              }}
+                              onMouseOver={(e) => {
+                                e.currentTarget.style.transform = 'scale(1.05)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+                                e.currentTarget.style.border = '1px solid rgba(220, 38, 38, 0.5)';
+                              }}
+                              onMouseOut={(e) => {
+                                e.currentTarget.style.transform = 'scale(1)';
+                                e.currentTarget.style.boxShadow = 'none';
+                                e.currentTarget.style.border = '1px solid #343a40';
+                              }}
+                            />
+                            <div className="position-absolute top-0 bottom-0 start-0 end-0 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center rounded-3 cover-overlay"
+                                style={{opacity: 0, transition: 'all 0.3s ease'}}>
+                              <div className="bg-danger rounded-circle d-flex align-items-center justify-content-center play-button-mini"
+                                  style={{
+                                    width: '32px',
+                                    height: '32px',
+                                    transform: 'scale(0.9)',
+                                    transition: 'all 0.3s ease',
+                                    boxShadow: '0 4px 12px rgba(220, 38, 38, 0.2)'
+                                  }}>
+                                <Play size={16} fill="white" style={{marginLeft: '2px'}} />
+                              </div>
                             </div>
                           </div>
+                          <div>
+                            <div className="fs-5 fw-semibold text-white song-title mb-0" style={{transition: 'all 0.3s ease'}}>{item.title}</div>
+                            <div className="text-secondary">{item.artist}</div>
+                          </div>
                         </div>
-                        <div>
-                          <div className="fs-5 fw-semibold text-white song-title mb-0" style={{transition: 'all 0.3s ease'}}>{item.title}</div>
-                          <div className="text-secondary">{item.artist}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-4 text-secondary fs-6">{item.album}</td>
-                    <td className="py-4 text-end text-secondary fs-6 pe-4">{item.duration}</td>
-                    <td className="py-3 text-end position-relative pe-2" style={{ width: '50px' }}>
-                      <button 
-                        className="btn btn-link p-2"
-                        style={{ 
-                          opacity: 0.75,
-                          transition: 'all 0.3s ease',
-                          transform: 'scale(1)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          marginLeft: 'auto'
-                        }}
-                        onMouseOver={(e) => {
-                          e.currentTarget.style.opacity = 1;
-                          e.currentTarget.style.transform = 'scale(1.1)';
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.opacity = 0.75;
-                          e.currentTarget.style.transform = 'scale(1)';
-                        }}
-                        onClick={() => toggleFavorite(item.id)}
-                      >
-                        <Heart 
-                          size={24} 
-                          fill={isFavorite ? "#dc3545" : "none"} 
-                          color={isFavorite ? "#dc3545" : "white"} 
-                          className={isFavorite ? "animate-pulse" : ""}
-                        />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      </td>
+                      <td className="py-4 text-secondary fs-6">{item.album}</td>
+                      <td className="py-4 text-end text-secondary fs-6 pe-4">{item.duration}</td>
+                      <td className="py-3 text-end position-relative pe-2" style={{ width: '50px' }}>
+                        <button 
+                          className="btn btn-link p-2"
+                          style={{ 
+                            opacity: 0.75,
+                            transition: 'all 0.3s ease',
+                            transform: 'scale(1)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            marginLeft: 'auto'
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.opacity = 1;
+                            e.currentTarget.style.transform = 'scale(1.1)';
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.opacity = 0.75;
+                            e.currentTarget.style.transform = 'scale(1)';
+                          }}
+                          onClick={() => toggleFavorite(item.id)}
+                        >
+                          <Heart 
+                            size={24} 
+                            fill={isFavorite ? "#dc3545" : "none"} 
+                            color={isFavorite ? "#dc3545" : "white"} 
+                            className={isFavorite ? "animate-pulse" : ""}
+                          />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      {/* CSS for hover effects */}
+      {/* CSS for hover and scrollbar effects */}
       <style jsx>{`
+        .search-page-root {
+          height: 100%;
+          width: 100%;
+          overflow: hidden;
+          background-color: #121212;
+          color: white;
+          display: flex;
+          flex-direction: column;
+        }
+        
+        .search-page-container {
+          height: 100%;
+          overflow-y: auto;
+          padding: 2rem;
+          scrollbar-width: thin;
+          scrollbar-color: rgba(220, 53, 69, 0.5) rgba(33, 37, 41, 0.2);
+        }
+        
+        /* Custom scrollbar styling for Chrome, Edge, and Safari */
+        .search-page-container::-webkit-scrollbar {
+          width: 8px;
+        }
+        
+        .search-page-container::-webkit-scrollbar-track {
+          background: rgba(33, 37, 41, 0.2);
+          border-radius: 4px;
+        }
+        
+        .search-page-container::-webkit-scrollbar-thumb {
+          background: rgba(220, 53, 69, 0.5);
+          border-radius: 4px;
+          transition: background 0.3s ease;
+        }
+        
+        .search-page-container::-webkit-scrollbar-thumb:hover {
+          background: rgba(220, 53, 69, 0.8);
+        }
+        
+        .search-results-section {
+          margin-bottom: 2rem;
+        }
+        
         .song-number {
           transition: all 0.3s ease;
         }
+        
         tr:hover .song-number {
           opacity: 0;
         }
+        
         tr:hover .song-title {
           color: #f87171 !important;
           text-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
         }
+        
         tr:hover .cover-overlay {
           opacity: 1 !important;
         }
+        
         tr:hover .play-button-mini {
           transform: scale(1) !important;
           transition: all 0.3s ease;
         }
+        
         .cover-overlay {
           opacity: 0;
           transition: all 0.3s ease;
         }
+        
         .trending-item:hover .cover-overlay {
           opacity: 1 !important;
         }
+        
         .trending-item:hover .play-button-mini {
           transform: scale(1) !important;
+        }
+        
+        .table-responsive {
+          overflow-x: auto;
+          scrollbar-width: thin;
+          scrollbar-color: rgba(220, 53, 69, 0.5) rgba(33, 37, 41, 0.2);
+        }
+        
+        .table-responsive::-webkit-scrollbar {
+          height: 6px;
+        }
+        
+        .table-responsive::-webkit-scrollbar-track {
+          background: rgba(33, 37, 41, 0.2);
+          border-radius: 3px;
+        }
+        
+        .table-responsive::-webkit-scrollbar-thumb {
+          background: rgba(220, 53, 69, 0.5);
+          border-radius: 3px;
+        }
+        
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+          background: rgba(220, 53, 69, 0.8);
         }
       `}</style>
     </div>

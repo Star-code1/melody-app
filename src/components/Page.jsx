@@ -1,18 +1,26 @@
-import { Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
 import MySong from "../pages/MySong";
 import LikedSongsPage from '../pages/LikedSongs'
 import SearchPage from '../pages/SearchPage'
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Container, Form, Button, Navbar, Nav } from "react-bootstrap";
+import Login from '../pages/Login';
+import Signup from '../pages/Signup';
+import PasswordReset from '../pages/PasswordReset';
 
 function Page() {
   return (
-    <div className="vh-100">
+    <div className="vh-100 m-2 rounded">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/SearchPage" element={<SearchPage />} />
         <Route path="/MySong" element={<MySong />} />
         <Route path="/LikedSongsPage" element={<LikedSongsPage />} />
-      </Routes>
+        <Route path="/Login" element={<Login />} />
+        <Route path="/Signup" element={<Signup />} />
+        <Route path="/PasswordReset" element={<PasswordReset />} />
+        </Routes>
     </div>
   );
 }

@@ -1,18 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, UserCircle, User, LogOut, Settings, Heart, Clock, Download } from 'lucide-react';
+import AccountMenu from "../components/AccountMenuButton"; 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Header = ({ isLoggedIn = false }) => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   const toggleUserMenu = () => {
     setIsUserMenuOpen(!isUserMenuOpen);
   };
+  
+  // Function to check authentication status
+  const checkAuthStatus = () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const storedUser = JSON.parse(token) || {};
+      setUser(storedUser);
+    } else {
+      setUser(null);
+    }
+  };
+
+  useEffect(() => {
+    // Check auth status when component mounts
+    checkAuthStatus();
+    
+    // Set up event listener for storage changes
+    window.addEventListener("storage", checkAuthStatus);
+    
+    // Set up event listener for custom auth events
+    window.addEventListener("userAuthChanged", checkAuthStatus);
+    
+    return () => {
+      window.removeEventListener("storage", checkAuthStatus);
+      window.removeEventListener("userAuthChanged", checkAuthStatus);
+    };
+  }, []);
 
   // Custom styles for Bootstrap
   const customStyles = {
     header: {
-      background: 'linear-gradient(to right,rgb(71, 57, 70),rgb(6, 24, 98))',
       padding: '16px',
     },
     navButton: {
@@ -67,10 +97,10 @@ const Header = ({ isLoggedIn = false }) => {
     <div style={customStyles.header} className="d-flex align-items-center justify-content-between">
       {/* Left side - Navigation arrows */}
       <div className="d-flex gap-2">
-        <button style={customStyles.navButton} className="btn">
+        <button onClick={() => navigate(-1)} style={customStyles.navButton} className="btn rounded">
           <ChevronLeft size={20} />
         </button>
-        <button style={customStyles.navButton} className="btn">
+        <button onClick={() => navigate(+1)} style={customStyles.navButton} className="btn rounded">
           <ChevronRight size={20} />
         </button>
       </div>
@@ -80,122 +110,10 @@ const Header = ({ isLoggedIn = false }) => {
 
       {/* Right side - Authentication */}
       <div>
-        {isLoggedIn ? (
-          <div className="position-relative">
-            <button 
-              onClick={toggleUserMenu}
-              style={customStyles.navButton}
-              className="btn"
-            >
-              <UserCircle size={20} />
-            </button>
-
-            {/* User dropdown menu */}
-            {isUserMenuOpen && (
-              <div style={customStyles.userMenu}>
-                <div className="py-1">
-                  <a
-                    href="#"
-                    style={customStyles.menuItem}
-                    className="d-flex align-items-center"
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = customStyles.menuItemHover.backgroundColor;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '';
-                    }}
-                  >
-                    <User className="me-2" size={16} />
-                    Hồ sơ cá nhân
-                  </a>
-                  <a
-                    href="#"
-                    style={customStyles.menuItem}
-                    className="d-flex align-items-center"
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = customStyles.menuItemHover.backgroundColor;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '';
-                    }}
-                  >
-                    <Heart className="me-2" size={16} />
-                    Bài hát yêu thích
-                  </a>
-                  <a
-                    href="#"
-                    style={customStyles.menuItem}
-                    className="d-flex align-items-center"
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = customStyles.menuItemHover.backgroundColor;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '';
-                    }}
-                  >
-                    <Clock className="me-2" size={16} />
-                    Nghe gần đây
-                  </a>
-                  <a
-                    href="#"
-                    style={customStyles.menuItem}
-                    className="d-flex align-items-center"
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = customStyles.menuItemHover.backgroundColor;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '';
-                    }}
-                  >
-                    <Download className="me-2" size={16} />
-                    Tải xuống
-                  </a>
-                  <a
-                    href="#"
-                    style={customStyles.menuItem}
-                    className="d-flex align-items-center"
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = customStyles.menuItemHover.backgroundColor;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '';
-                    }}
-                  >
-                    <Settings className="me-2" size={16} />
-                    Cài đặt
-                  </a>
-                  <a
-                    href="#"
-                    style={customStyles.menuItem}
-                    className="d-flex align-items-center"
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = customStyles.menuItemHover.backgroundColor;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '';
-                    }}
-                  >
-                    <LogOut className="me-2" size={16} />
-                    Đăng xuất
-                  </a>
-                </div>
-              </div>
-            )}
-          </div>
+        {user ? (
+          <AccountMenu />
         ) : (
           <div className="d-flex gap-3">
-            <button 
-              style={customStyles.signupButton}
-              className="btn"
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
-            >
-              Đăng ký
-            </button>
             <button 
               style={customStyles.loginButton}
               className="btn"
@@ -205,6 +123,7 @@ const Header = ({ isLoggedIn = false }) => {
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
+              onClick={() => navigate("/login")}
             >
               Đăng nhập
             </button>

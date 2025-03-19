@@ -2,58 +2,90 @@ import { Dropdown } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import PasswordResetModal from "./PasswordResetModal";
 import ProfileModal from "./ProfileModal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function AccountMenuButton({ onProfileClick }) {
     const navigate = useNavigate();
-    const token = localStorage.getItem("token");
-    const userData = token ? JSON.parse(token) : null;
-    
-    const avatar = userData.avatar || "";
-    const username = userData.name ? userData.name.charAt(0).toUpperCase() : "t"; // Nếu không có avatar, hiển thị chữ cái đầu
-
+    const [userData, setUserData] = useState(null);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [showProfileModal, setShowProfileModal] = useState(false);
+    
+    useEffect(() => {
+        const checkUserData = () => {
+            const token = localStorage.getItem("token");
+            setUserData(token ? JSON.parse(token) : null);
+        };
+        
+        checkUserData();
+        window.addEventListener("storage", checkUserData);
+        window.addEventListener("userAuthChanged", checkUserData);
+        
+        return () => {
+            window.removeEventListener("storage", checkUserData);
+            window.removeEventListener("userAuthChanged", checkUserData);
+        };
+    }, []);
+
+    const avatar = userData?.avatar || "";
+    const username = userData?.name ? userData.name.charAt(0).toUpperCase() : "S";
 
     const handleLogout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+        window.dispatchEvent(new Event("userAuthChanged"));
         navigate("/login");
     };
 
     return (
         <>
-                <Dropdown>
+            <Dropdown>
                 <Dropdown.Toggle
                     variant="dark"
-                    className="rounded-circle p-2 d-flex align-items-center"
-                    style={{ background: "#1c1c1c", border: "none", width: "85px", height: "85px" }}
+                    id="dropdown-avatar"
+                    className="p-0 border-0 bg-transparent"
+                    style={{ boxShadow: 'none' }}
                 >
-                    {avatar ? (
-                        <img
-                            src={avatar}
-                            alt="Avatar"
-                            className="rounded-circle"
-                            style={{ width: "35px", height: "35px", objectFit: "cover" }}
-                        />
-                    ) : (
-                        <span
-                            className="text-white d-flex justify-content-center align-items-center"
-                            style={{
-                                width: "60px",
-                                height: "60px",
-                                background: "#ff4081",
-                                borderRadius: "50%",
-                                fontWeight: "bold",
-                                fontSize: "2rem",
-                            }}
-                        >
-                            {username.charAt(0).toUpperCase()}
-                        </span>
-                    )}
+                    <div className="d-flex align-items-center justify-content-center" 
+                         style={{
+                             width: "2.5rem",
+                             height: "2.5rem",
+                             borderRadius: "50%",
+                             overflow: "hidden",
+                             backgroundColor: avatar ? "transparent" : "#ff4081",
+                             boxShadow: "0 2px 5px rgba(0,0,0,0.2)"
+                         }}>
+                        {avatar ? (
+                            <img
+                                src={avatar}
+                                alt="Avatar"
+                                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                            />
+                        ) : (
+                            <span
+                                className="d-flex justify-content-center align-items-center text-white"
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    fontWeight: "bold",
+                                    fontSize: "1.2rem"
+                                }}
+                            >
+                                {username}
+                            </span>
+                        )}
+                    </div>
                 </Dropdown.Toggle>
 
-                <Dropdown.Menu className="dropdown-menu-dark" style={{ fontSize: "2rem", padding: "10px" }}>
+                <Dropdown.Menu 
+                    align="end" 
+                    className="dropdown-menu-dark"
+                    style={{ 
+                        fontSize: "1rem", 
+                        padding: "0.5rem",
+                        marginTop: "0.5rem",
+                        borderRadius: "0.5rem"
+                    }}
+                >
                     <Dropdown.Item onClick={() => setShowProfileModal(true)}>Tài khoản</Dropdown.Item>
                     <Dropdown.Item onClick={() => setShowPasswordModal(true)}>Đổi mật khẩu</Dropdown.Item>
                     <Dropdown.Divider />
