@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Heart, Play, Clock, Music, MoreHorizontal, Ellipsis, UserPlus, Download, Trash2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 const LikedSongsPage = () => {
   const [currentSong, setCurrentSong] = useState(null);
@@ -28,104 +28,221 @@ const LikedSongsPage = () => {
     }
   };
 
+  // Custom styles
+  const customStyles = {
+    gradientHeader: {
+      background: 'linear-gradient(to right, rgba(220, 38, 38, 0.2), rgba(0, 0, 0, 0.8))'
+    },
+    gradientNavbar: {
+      background: 'linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(0, 0, 0, 0.95))'
+    },
+    gradientBackground: {
+      background: 'linear-gradient(to bottom, rgba(17, 24, 39, 0.95), rgba(0, 0, 0, 0.95))'
+    },
+    gradientText: {
+      background: 'linear-gradient(to right, #dc2626, #f87171)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent'
+    },
+    hoverRow: {
+      transition: 'all 0.3s ease'
+    },
+    currentSongHighlight: {
+      borderLeft: '4px solid #dc2626',
+      background: 'linear-gradient(to right, rgba(220, 38, 38, 0.1), transparent)'
+    },
+    playButton: {
+      backgroundColor: '#dc2626',
+      transition: 'all 0.3s ease',
+      boxShadow: '0 4px 12px rgba(220, 38, 38, 0.2)'
+    },
+    playButtonHover: {
+      backgroundColor: '#ef4444',
+      transform: 'scale(1.05)',
+      boxShadow: '0 6px 16px rgba(220, 38, 38, 0.3)'
+    }
+  };
 
   return (
-    <div className="tw:flex tw:flex-col tw:h-screen tw:bg-black tw:text-white" onClick={handleClickOutside}>
-
-      <div className="tw:flex tw:p-8 tw:items-end tw:space-x-6 tw:bg-gradient-to-r tw:from-red-900/50 tw:to-black">
-        <div className="tw:bg-gradient-to-br tw:from-red-600 tw:to-red-400 tw:w-42 tw:h-42 tw:flex tw:items-center tw:justify-center tw:rounded-lg tw:shadow-2xl">
-          <Heart size={80} fill="white" color="white" className="tw:drop-shadow-xl" />
+    <div className="d-flex flex-column vh-100 bg-dark text-white" onClick={handleClickOutside}>
+      {/* Header */}
+      <div className="d-flex p-4 align-items-end" style={customStyles.gradientHeader}>
+        <div className="d-flex align-items-center justify-content-center rounded-3 shadow me-4" 
+             style={{
+               background: 'linear-gradient(135deg, #dc2626, #f87171)',
+               width: '160px',
+               height: '160px',
+               transition: 'all 0.3s ease'
+             }}
+             onMouseOver={(e) => {
+               e.currentTarget.style.transform = 'scale(1.02)';
+               e.currentTarget.style.boxShadow = '0 8px 24px rgba(220, 38, 38, 0.3)';
+             }}
+             onMouseOut={(e) => {
+               e.currentTarget.style.transform = 'scale(1)';
+               e.currentTarget.style.boxShadow = 'none';
+             }}>
+          <Heart size={80} fill="white" color="white" />
         </div>
-        <div className="tw:flex tw:flex-col">
-          <span className="tw:uppercase tw:text-sm tw:font-semibold">Playlist</span>
-          <h1 className="tw:text-7xl tw:font-bold tw:mb-6 tw:bg-gradient-to-r tw:from-red-600 tw:to-red-400 tw:bg-clip-text tw:text-transparent">Liked Songs</h1>
-          <div className="tw:flex tw:items-center tw:text-sm">
-            <span className="tw:opacity-80">Những bài hát bạn yêu thích</span>
+        <div className="d-flex flex-column">
+          <span className="text-uppercase small fw-semibold text-white-50">Playlist</span>
+          <h1 className="display-4 fw-bold mb-3 text-danger">Liked Songs</h1>
+          <div className="d-flex align-items-center small">
+            <span className="text-white-50">Những bài hát bạn yêu thích</span>
           </div>
         </div>
       </div>
 
-      <div className="tw:px-8 tw:py-4 tw:flex tw:items-center tw:space-x-6 tw:bg-gradient-to-r tw:from-gray-900 tw:to-black">
-        <button className="tw:bg-red-600 tw:hover:tw:bg-red-500 tw:rounded-full tw:w-14 tw:h-14 tw:flex tw:items-center tw:justify-center tw:shadow-lg tw:transition-colors tw:duration-300">
-          <Play size={28} fill="white" className="tw:ml-1" />
+      {/* Player Controls */}
+      <div className="px-4 py-3 d-flex align-items-center" style={customStyles.gradientNavbar}>
+        <button className="btn rounded-circle d-flex align-items-center justify-content-center me-3" 
+                style={customStyles.playButton}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = '#ef4444';
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(220, 38, 38, 0.3)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = '#dc2626';
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.2)';
+                }}>
+          <Play size={28} fill="white" style={{marginLeft: '2px'}} />
         </button>
-        <button className="tw:opacity-70 tw:hover:tw:opacity-100 tw:transition-opacity tw:duration-300">
-          <Heart size={32} fill="#dc2626" className="tw:text-red-600" />
+        <button className="btn text-white-50 me-3" 
+                style={{opacity: 0.7, transition: 'all 0.3s ease'}}
+                onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+                onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}>
+          <Heart size={32} fill="#dc2626" />
         </button>
-        <button className="tw:opacity-70 tw:hover:tw:opacity-100 tw:transition-opacity tw:duration-300">
+        <button className="btn text-white-50" 
+                style={{opacity: 0.7, transition: 'all 0.3s ease'}}
+                onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+                onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}>
           <MoreHorizontal size={24} />
         </button>
       </div>
-      <div className="tw:flex-1 tw:px-8 tw:overflow-y-auto tw:backdrop-blur-sm tw:bg-gradient-to-b tw:from-gray-900/80 tw:to-black">
-        <table className="tw:w-full tw:border-collapse">
+
+      {/* Song List */}
+      <div className="flex-grow-1 px-4 overflow-auto" style={customStyles.gradientBackground}>
+        <table className="table table-dark table-borderless">
           <thead>
-              <tr className="tw:border-b tw:border-white tw:border-opacity-10 tw:text-sm tw:opacity-70">
-              <th className="tw:px-4 tw:py-2 tw:font-bold tw:text-lg tw:text-left tw:w-12">#</th>
-              <th className="tw:px-4 tw:py-2 tw:font-bold tw:text-lg tw:text-left">Tiêu đề</th>
-              <th className="tw:px-4 tw:py-2 tw:font-bold tw:text-lg tw:text-left">Album</th>
-              <th className="tw:px-4 tw:py-2 tw:font-bold tw:float-right">
+            <tr className="border-bottom border-secondary border-opacity-25 text-white-50">
+              <th className="ps-3 fw-bold fs-5 text-start">#</th>
+              <th className="fw-bold fs-5 text-start">Tiêu đề</th>
+              <th className="fw-bold fs-5 text-start">Album</th>
+              <th className="text-end pe-4">
                 <Clock size={24} />
               </th>
-              <th className="tw:px-2 tw:py-2 tw:font-bold tw:float-right">
-              </th>
+              <th className="text-end pe-2 w-auto"></th>
             </tr>
           </thead>
           <tbody>
             {likedSongs.map((song, index) => (
               <tr
                 key={song.id}
-                className={`tw:border-b tw:border-white tw:border-opacity-5 tw:hover:tw:bg-gradient-to-r tw:hover:tw:from-gray-900 tw:hover:tw:to-red-900/30 tw:hover:tw:border-l-4 tw:hover:tw:border-red-600 tw:transition-all tw:duration-300 tw:group ${currentSong === song.id ? 'tw:bg-gradient-to-r tw:from-red-900/20 tw:to-transparent tw:border-l-4 tw:border-red-600' : ''}`}
+                className={`border-bottom border-secondary border-opacity-10 ${currentSong === song.id ? 'active' : ''}`}
+                style={{
+                  ...customStyles.hoverRow,
+                  ...(currentSong === song.id ? customStyles.currentSongHighlight : {})
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(220, 38, 38, 0.1))';
+                  e.currentTarget.style.borderLeft = '4px solid #dc2626';
+                }}
+                onMouseOut={(e) => {
+                  if (currentSong !== song.id) {
+                    e.currentTarget.style.background = '';
+                    e.currentTarget.style.borderLeft = '';
+                  }
+                }}
                 onDoubleClick={() => handlePlay(song.id)}
               >
-                <td className="tw:px-4 tw:py-5 tw:text-center tw:text-lg tw:relative">
-                  {currentSong === song.id ?
-                    <Music size={20} className="tw:text-red-600" /> :
-                    <span className="tw:opacity-70 tw:group-hover:tw:opacity-0 tw:transition-opacity tw:duration-300">{index + 1}</span>
-                  }
-                  {currentSong !== song.id && 
-                    <Play size={20} className="tw:text-red-600 tw:absolute tw:opacity-0 tw:group-hover:tw:opacity-100 tw:transition-opacity tw:duration-300 tw:ml-4" />
-                  }
+                <td className="ps-3 py-4 text-center position-relative">
+                  {currentSong === song.id ? (
+                    <Music size={20} className="text-danger" />
+                  ) : (
+                    <span className="text-white-50 song-number">{index + 1}</span>
+                  )}
+                  
                 </td>
-                <td className="tw:px-4 tw:py-5">
-                  <div className="tw:flex tw:items-center">
-                    <div className="tw:relative">
-                      <div className={`tw:absolute tw:inset-0 tw:rounded-md ${currentSong === song.id ? 'tw:shadow-lg tw:shadow-red-900' : ''}`}></div>
-                      <img src={song.coverArt} alt={song.title} className="tw:w-16 tw:h-16 tw:rounded-md tw:object-cover tw:border tw:border-gray-800" />
-                      <div className="tw:absolute tw:inset-0 tw:bg-black tw:bg-opacity-30 tw:flex tw:items-center tw:justify-center tw:opacity-0 tw:group-hover:tw:opacity-100 tw:transition-opacity tw:duration-300 tw:rounded-md">
-                        <div className="tw:w-8 tw:h-8 tw:bg-red-600 tw:rounded-full tw:flex tw:items-center tw:justify-center tw:transform tw:scale-90 tw:group-hover:tw:scale-100 tw:transition-transform tw:duration-300">
-                          <Play size={16} fill="white" className="tw:ml-0.5" />
+                <td className="py-3">
+                  <div className="d-flex align-items-center">
+                    <div className="position-relative">
+                      <div className={`position-absolute top-0 bottom-0 start-0 end-0 rounded-3 ${currentSong === song.id ? 'shadow-danger' : ''}`}></div>
+                      <img 
+                        src={song.coverArt} 
+                        alt={song.title} 
+                        className="rounded-3 object-fit-cover border border-secondary" 
+                        style={{
+                          width: '64px',
+                          height: '64px',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.transform = 'scale(1.05)';
+                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.2)';
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.transform = 'scale(1)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      />
+                      <div className="position-absolute top-0 bottom-0 start-0 end-0 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center rounded-3 cover-overlay"
+                           style={{opacity: 0, transition: 'all 0.3s ease'}}>
+                        <div className="bg-danger rounded-circle d-flex align-items-center justify-content-center play-button-mini"
+                             style={{
+                               width: '32px',
+                               height: '32px',
+                               transform: 'scale(0.9)',
+                               transition: 'all 0.3s ease'
+                             }}>
+                          <Play size={16} fill="white" style={{marginLeft: '2px'}} />
                         </div>
                       </div>
                     </div>
-                    <div className="tw:ml-6">
-                      <div className={`tw:text-xl tw:font-semibold ${currentSong === song.id ? 'tw:text-red-600' : 'tw:text-white tw:group-hover:tw:text-red-400'} tw:transition-colors tw:duration-300`}>{song.title}</div>
-                      <div className="tw:text-base tw:text-gray-400">{song.artist}</div>
+                    <div className="ms-3">
+                      <div className={`fs-5 fw-semibold ${currentSong === song.id ? 'text-danger' : 'text-white song-title'}`}
+                           style={{transition: 'all 0.3s ease'}}>{song.title}</div>
+                      <div className="text-secondary">{song.artist}</div>
                     </div>
                   </div>
-                </td> 
-                <td className="tw:px-4 tw:py-5 tw:text-gray-400 tw:text-lg">{song.album}</td>
-                <td className="tw:px-4 tw:py-5 tw:text-right tw:text-gray-400 tw:text-lg">{song.duration}</td>
-                <td className="tw:px-2 tw:py-5 tw:text-right tw:relative" onClick={(e) => {
+                </td>
+                <td className="py-3 text-secondary fs-6">{song.album}</td>
+                <td className="py-3 text-end text-secondary fs-6 pe-4">{song.duration}</td>
+                <td className="py-3 text-end position-relative pe-4" onClick={(e) => {
                   e.stopPropagation();
                   setActiveMenu(activeMenu === song.id ? null : song.id);
                 }}>
-                  <Ellipsis size={24} className="tw:opacity-0 tw:group-hover:tw:opacity-100 tw:transition-opacity tw:duration-300" />
+                  <Ellipsis size={24} className="song-more-icon" style={{opacity: 0, transition: 'all 0.3s ease'}} />
                   {activeMenu === song.id && (
-                     <div className="tw:absolute tw:right-0 tw:top-20 tw:bg-gray-800 tw:rounded-md tw:shadow-lg tw:py-2 tw:w-52 tw:z-10">
-                     <button className="tw:w-full tw:px-4 tw:py-2 tw:text-left tw:text-sm tw:hover:tw:bg-gradient-to-r tw:hover:tw:from-gray-700 tw:hover:tw:to-red-900/20 tw:flex tw:items-center tw:transition-colors tw:duration-200">
-                       <UserPlus size={16} className="tw:mr-3" />
-                       <span>Add to playlist</span>
-                     </button>
-                     <button className="tw:w-full tw:px-4 tw:py-2 tw:text-left tw:text-sm tw:hover:tw:bg-gradient-to-r tw:hover:tw:from-gray-700 tw:hover:tw:to-red-900/20 tw:flex tw:items-center tw:transition-colors tw:duration-200">
-                       <Download size={16} className="tw:mr-3" />
-                       <span>Download</span>
-                     </button>
-                     <div className="tw:border-t tw:border-gray-700 tw:my-1"></div>
-                     <button className="tw:w-full tw:px-4 tw:py-2 tw:text-left tw:text-sm tw:text-red-400 tw:hover:tw:bg-gradient-to-r tw:hover:tw:from-gray-700 tw:hover:tw:to-red-900/20 tw:flex tw:items-center tw:transition-colors tw:duration-200">
-                       <Trash2 size={16} className="tw:mr-3" />
-                       <span>Delete</span>
-                     </button>
-                   </div>
+                    <div className="position-absolute end-0 top-10 bg-dark rounded-3 shadow-lg py-2 mt-2 dropdown-menu show" 
+                         style={{
+                           width: '200px',
+                           zIndex: 10,
+                           background: 'rgba(17, 24, 39, 0.95)',
+                           border: '1px solid rgba(255, 255, 255, 0.1)'
+                         }}>
+                      <button className="dropdown-item text-white d-flex align-items-center px-3 py-2 small"
+                              onMouseOver={(e) => e.currentTarget.style.background = 'linear-gradient(to right, rgba(55, 65, 81, 0.8), rgba(220, 38, 38, 0.1))'}
+                              onMouseOut={(e) => e.currentTarget.style.background = ''}>
+                        <UserPlus size={16} className="me-3" />
+                        <span>Add to playlist</span>
+                      </button>
+                      <button className="dropdown-item text-white d-flex align-items-center px-3 py-2 small"
+                              onMouseOver={(e) => e.currentTarget.style.background = 'linear-gradient(to right, rgba(55, 65, 81, 0.8), rgba(220, 38, 38, 0.1))'}
+                              onMouseOut={(e) => e.currentTarget.style.background = ''}>
+                        <Download size={16} className="me-3" />
+                        <span>Download</span>
+                      </button>
+                      <div className="dropdown-divider border-secondary my-1"></div>
+                      <button className="dropdown-item text-danger d-flex align-items-center px-3 py-2 small"
+                              onMouseOver={(e) => e.currentTarget.style.background = 'linear-gradient(to right, rgba(55, 65, 81, 0.8), rgba(220, 38, 38, 0.1))'}
+                              onMouseOut={(e) => e.currentTarget.style.background = ''}>
+                        <Trash2 size={16} className="me-3" />
+                        <span>Delete</span>
+                      </button>
+                    </div>
                   )}
                 </td>
               </tr>
@@ -133,6 +250,29 @@ const LikedSongsPage = () => {
           </tbody>
         </table>
       </div>
+
+      {/* CSS for hover effects */}
+      <style jsx>{`
+        .song-number {
+          transition: all 0.3s ease;
+        }
+        tr:hover .song-number {
+          opacity: 0;
+        }
+        tr:hover .song-more-icon {
+          opacity: 1 !important;
+        }
+        tr:hover .song-title {
+          color: #f87171 !important;
+        }
+        tr:hover .cover-overlay {
+          opacity: 1 !important;
+        }
+        tr:hover .play-button-mini {
+          transform: scale(1) !important;
+          transition: all 0.3s ease;
+        }
+      `}</style>
     </div>
   );
 };

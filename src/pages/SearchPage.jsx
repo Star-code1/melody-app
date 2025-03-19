@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Heart, Search, Disc, TrendingUp, Play } from 'lucide-react';
-
-const MusicSearch = () => {
+import { Heart, Search, Disc, TrendingUp, Play, Clock, Ellipsis } from 'lucide-react';
+import 'bootstrap/dist/css/bootstrap.min.css'
+const SearchPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [favorites, setFavorites] = useState([3]);
   
@@ -39,120 +39,347 @@ const MusicSearch = () => {
     }
   };
 
-  return (
-    <div className="tw:min-h-screen tw:bg-black tw:text-white tw-p-6">
-      <div className="tw:max-w-4xl tw:mx-auto tw:py-4">
+  // Custom styles
+  const customStyles = {
+    gradientText: {
+      background: 'linear-gradient(135deg, #dc3545, #ff6b6b)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      textShadow: '0 2px 4px rgba(220, 53, 69, 0.2)'
+    },
+    searchInput: {
+      backgroundColor: '#343a40',
+      transition: 'all 0.3s ease',
+      border: '1px solid rgba(255, 255, 255, 0.15)',
+      color: '#ffffff'
+    },
+    searchInputHover: {
+      backgroundColor: '#3f474e',
+      border: '1px solid rgba(220, 53, 69, 0.3)',
+      boxShadow: '0 4px 12px rgba(220, 53, 69, 0.15)'
+    },
+    searchInputFocus: {
+      backgroundColor: '#3f474e',
+      border: '1px solid rgba(220, 53, 69, 0.5)',
+      boxShadow: '0 4px 12px rgba(220, 53, 69, 0.2)'
+    },
+    trendingItem: {
+      transition: 'all 0.3s ease',
+      border: '1px solid transparent',
+      backgroundColor: 'transparent'
+    },
+    trendingItemHover: {
+      transform: 'translateY(-2px)',
+      backgroundColor: 'rgba(33, 37, 41, 0.8)',
+      border: '1px solid rgba(220, 53, 69, 0.2)',
+      boxShadow: '0 4px 12px rgba(220, 53, 69, 0.1)'
+    },
+    searchResult: {
+      transition: 'all 0.3s ease',
+      borderLeft: '4px solid transparent',
+      boxShadow: 'none'
+    },
+    searchResultHover: {
+      background: 'linear-gradient(to right, rgba(33, 37, 41, 0.8), rgba(220, 53, 69, 0.1))',
+      borderLeft: '4px solid #dc3545',
+      boxShadow: '0 4px 12px rgba(220, 53, 69, 0.1)'
+    },
+    coverArt: {
+      transition: 'all 0.3s ease'
+    },
+    coverArtHover: {
+      transform: 'scale(1.05)',
+      boxShadow: '0 4px 12px rgba(220, 53, 69, 0.2)'
+    }
+  };
 
-        <div className="tw:flex tw:items-center tw:mb-6">
-          <Disc size={36} className="tw:text-red-600 tw:mr-3" />
-          <h1 className="tw:text-4xl tw:font-bold tw:bg-gradient-to-r tw:from-red-600 tw:to-red-400 tw:bg-clip-text tw:text-transparent">
+  return (
+    <div className="min-vh-100 bg-dark text-white p-4">
+      <div className="container py-4">
+        <div className="d-flex align-items-center mb-4">
+          <Disc size={36} className="text-danger me-3" />
+          <h1 className="display-5 fw-bold" style={customStyles.gradientText}>
             Search
           </h1>
         </div>
         
-        <div className="tw:mb-8 tw:relative">
-          <div className="tw:absolute tw:inset-y-0 tw:left-0 tw:pl-3 tw:flex tw:items-center tw:pointer-events-none">
-            <Search size={20} className="tw:text-gray-400" />
+        <div className="mb-5 position-relative">
+          <div className="position-absolute top-50 start-0 translate-middle-y ms-3">
+            <Search size={20} className="text-secondary" />
           </div>
           <input
             type="text"
             placeholder="What do you want to listen to?"
-            className="tw:w-full tw:bg-gray-800 tw:text-white tw:pl-10 tw:p-4 tw:rounded-full focus:tw:outline-none focus:tw:ring-2 focus:tw:ring-red-600 tw:transition-all tw:duration-300 tw:shadow-lg"
+            className="form-control form-control-lg text-white border-0 ps-5 rounded-pill"
+            style={customStyles.searchInput}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = customStyles.searchInputHover.backgroundColor;
+              e.currentTarget.style.border = customStyles.searchInputHover.border;
+              e.currentTarget.style.boxShadow = customStyles.searchInputHover.boxShadow;
+            }}
+            onMouseOut={(e) => {
+              if (!e.currentTarget.matches(':focus')) {
+                e.currentTarget.style.backgroundColor = customStyles.searchInput.backgroundColor;
+                e.currentTarget.style.border = customStyles.searchInput.border;
+                e.currentTarget.style.boxShadow = 'none';
+              }
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.backgroundColor = customStyles.searchInputFocus.backgroundColor;
+              e.currentTarget.style.border = customStyles.searchInputFocus.border;
+              e.currentTarget.style.boxShadow = customStyles.searchInputFocus.boxShadow;
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.backgroundColor = customStyles.searchInput.backgroundColor;
+              e.currentTarget.style.border = customStyles.searchInput.border;
+              e.currentTarget.style.boxShadow = 'none';
+            }}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
-        <div className="tw:mb-10">
-          <div className="tw:flex tw:items-center tw:mb-4">
-            <TrendingUp size={24} className="tw:text-red-600 tw:mr-2" />
-            <h2 className="tw:text-2xl tw:font-bold">Top Trending</h2>
+        <div className="mb-5">
+          <div className="d-flex align-items-center mb-3">
+            <TrendingUp size={24} className="text-danger me-2" />
+            <h2 className="fs-2 fw-bold mb-0">Top Trending</h2>
           </div>
           
-          <div className="tw:grid tw:grid-cols-2 md:tw:grid-cols-2 tw:gap-4">
+          <div className="row g-3">
             {topTrendingSongs.map((song, index) => (
-              <div 
-                key={song.id}
-                className="tw:flex tw:items-center tw:bg-gray-900/40 tw:p-3 tw:rounded-lg hover:tw:bg-gradient-to-r hover:tw:from-gray-900 hover:tw:to-red-900/30 tw:transition-all tw:duration-300 tw:group"
-              >
-                <div className="tw:flex-shrink-0 tw:mr-3 tw:text-xl tw:font-bold tw:text-gray-400 tw:w-6">
-                  {index + 1}
-                </div>
-                <div className="tw:relative tw:flex-shrink-0">
-                  <img 
-                    src={song.coverArt} 
-                    alt={song.title} 
-                    className="tw:w-14 tw:h-14 tw:rounded-md tw:object-cover tw:border tw:border-gray-800"
-                  />
-                  <div className="tw:absolute tw:inset-0 tw:bg-black tw:bg-opacity-30 tw:flex tw:items-center tw:justify-center tw:opacity-0 tw:group-hover:tw:opacity-100 tw:transition-opacity tw:duration-300 tw:rounded-md">
-                    <div className="tw:w-7 tw:h-7 tw:bg-red-600 tw:rounded-full tw:flex tw:items-center tw:justify-center">
-                      <Play size={14} fill="white" className="tw:ml-0.5" />
+              <div key={song.id} className="col-md-6">
+                <div className="d-flex align-items-center p-3 rounded-3 position-relative trending-item"
+                  style={customStyles.trendingItem}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = customStyles.trendingItemHover.transform;
+                    e.currentTarget.style.backgroundColor = customStyles.trendingItemHover.backgroundColor;
+                    e.currentTarget.style.border = customStyles.trendingItemHover.border;
+                    e.currentTarget.style.boxShadow = customStyles.trendingItemHover.boxShadow;
+                    const overlay = e.currentTarget.querySelector('.cover-overlay');
+                    const playButton = e.currentTarget.querySelector('.play-button-mini');
+                    if (overlay) overlay.style.opacity = '1';
+                    if (playButton) playButton.style.transform = 'scale(1)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'none';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.border = '1px solid transparent';
+                    e.currentTarget.style.boxShadow = 'none';
+                    const overlay = e.currentTarget.querySelector('.cover-overlay');
+                    const playButton = e.currentTarget.querySelector('.play-button-mini');
+                    if (overlay) overlay.style.opacity = '0';
+                    if (playButton) playButton.style.transform = 'scale(0.9)';
+                  }}>
+                  <div className="me-3 fs-4 fw-bold text-secondary" style={{ width: '24px' }}>
+                    {index + 1}
+                  </div>
+                  <div className="position-relative me-3">
+                    <img 
+                      src={song.coverArt} 
+                      alt={song.title} 
+                      className="rounded-3" 
+                      style={{
+                        ...customStyles.coverArt,
+                        width: '56px',
+                        height: '56px',
+                        objectFit: 'cover',
+                        border: '1px solid #343a40'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.transform = customStyles.coverArtHover.transform;
+                        e.currentTarget.style.boxShadow = customStyles.coverArtHover.boxShadow;
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
+                    />
+                    <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center rounded-3 cover-overlay"
+                      style={{ 
+                        opacity: 0, 
+                        transition: 'all 0.3s ease',
+                        cursor: 'pointer'
+                      }}>
+                      <div className="bg-danger rounded-circle d-flex align-items-center justify-content-center play-button-mini"
+                        style={{ 
+                          width: '28px', 
+                          height: '28px',
+                          transition: 'all 0.3s ease',
+                          transform: 'scale(0.9)',
+                          boxShadow: '0 4px 12px rgba(220, 38, 38, 0.2)'
+                        }}>
+                        <Play size={14} fill="white" style={{ marginLeft: '2px' }} />
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="tw:ml-3 tw:flex-grow">
-                  <h3 className="tw:text-base tw:font-semibold tw:text-white tw:truncate">{song.title}</h3>
-                  <p className="tw:text-sm tw:text-gray-400 tw:truncate">{song.artist}</p>
-                </div>
-                <div className="tw:flex-shrink-0 tw:ml-2 tw:text-sm tw:text-gray-400">
-                  {song.plays}
+                  <div className="flex-grow-1">
+                    <h3 className="fs-6 fw-semibold text-white text-truncate mb-0">{song.title}</h3>
+                    <p className="small text-secondary text-truncate mb-0">{song.artist}</p>
+                  </div>
+                  <div className="ms-2 small text-secondary">
+                    {song.plays}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
         
-        <div className="tw:mt-8">
-          <h2 className="tw:text-2xl tw:font-bold tw:mb-4">Kết quả tìm kiếm</h2>
-          <div className="tw:space-y-2">
-            {musicItems.map((item) => {
-              const isFavorite = favorites.includes(item.id);
-              
-              return (
-                <div 
-                  key={item.id} 
-                  className="tw:flex tw:items-center tw:justify-between tw:p-3 tw:rounded-lg hover:tw:bg-gradient-to-r hover:tw:from-gray-900 hover:tw:to-red-900/30 hover:tw:border-l-4 hover:tw:border-red-600 tw:transition-all tw:duration-300 tw:group"
-                >
-                  <div className="tw:flex tw:items-center tw:space-x-4">
-                    <div className="tw:relative">
-                      <div 
-                        className={`tw:absolute tw:inset-0 tw:rounded-md ${isFavorite ? 'tw:shadow-lg tw:shadow-red-900' : ''}`}
-                      ></div>
-                      <img 
-                        src={item.coverArt} 
-                        alt={item.title} 
-                        className="tw:w-16 tw:h-16 tw:rounded-md tw:object-cover tw:border tw:border-gray-800"
-                      />
-                      <div className="tw:absolute tw:inset-0 tw:bg-black tw:bg-opacity-30 tw:flex tw:items-center tw:justify-center tw:opacity-0 tw:group-hover:tw:opacity-100 tw:transition-opacity tw:duration-300 tw:rounded-md">
-                        <div className="tw:w-8 tw:h-8 tw:bg-red-600 tw:rounded-full tw:flex tw:items-center tw:justify-center">
-                          <div className="tw:w-0 tw:h-0 tw:border-t-transparent tw:border-t-8 tw:border-b-transparent tw:border-b-8 tw:border-l-white tw:border-l-12 tw:ml-1"></div>
+        <div className="mt-5">
+          <h2 className="fs-2 fw-bold mb-4">Kết quả tìm kiếm</h2>
+          <table className="table table-dark table-borderless">
+            <thead>
+              <tr className="border-bottom border-secondary border-opacity-25 text-white-50">
+                <th className="ps-3 fw-bold fs-5 text-start">#</th>
+                <th className="fw-bold fs-5 text-start">Tiêu đề</th>
+                <th className="fw-bold fs-5 text-start">Album</th>
+                <th className="text-end pe-4">
+                  <Clock size={24} />
+                </th>
+                <th className="text-end pe-2 w-auto"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {musicItems.map((item, index) => {
+                const isFavorite = favorites.includes(item.id);
+                
+                return (
+                  <tr
+                    key={item.id}
+                    className="border-bottom border-secondary border-opacity-10"
+                    style={{
+                      ...customStyles.searchResult,
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(220, 38, 38, 0.2))';
+                      e.currentTarget.style.borderLeft = '4px solid #dc2626';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.15)';
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.background = '';
+                      e.currentTarget.style.borderLeft = '';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    <td className="ps-3 py-4 text-center position-relative">
+                      <span className="text-white-50 song-number">{index + 1}</span>
+                    </td>
+                    <td className="py-3">
+                      <div className="d-flex align-items-center">
+                        <div className="position-relative me-3">
+                          <div className={`position-absolute top-0 bottom-0 start-0 end-0 rounded-3 ${isFavorite ? 'shadow-danger' : ''}`}></div>
+                          <img 
+                            src={item.coverArt} 
+                            alt={item.title} 
+                            className="rounded-3 object-fit-cover border border-secondary" 
+                            style={{
+                              width: '64px',
+                              height: '64px',
+                              transition: 'all 0.3s ease'
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.transform = 'scale(1.05)';
+                              e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+                              e.currentTarget.style.border = '1px solid rgba(220, 38, 38, 0.5)';
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.transform = 'scale(1)';
+                              e.currentTarget.style.boxShadow = 'none';
+                              e.currentTarget.style.border = '1px solid #343a40';
+                            }}
+                          />
+                          <div className="position-absolute top-0 bottom-0 start-0 end-0 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center rounded-3 cover-overlay"
+                               style={{opacity: 0, transition: 'all 0.3s ease'}}>
+                            <div className="bg-danger rounded-circle d-flex align-items-center justify-content-center play-button-mini"
+                                 style={{
+                                   width: '32px',
+                                   height: '32px',
+                                   transform: 'scale(0.9)',
+                                   transition: 'all 0.3s ease',
+                                   boxShadow: '0 4px 12px rgba(220, 38, 38, 0.2)'
+                                 }}>
+                              <Play size={16} fill="white" style={{marginLeft: '2px'}} />
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="fs-5 fw-semibold text-white song-title mb-0" style={{transition: 'all 0.3s ease'}}>{item.title}</div>
+                          <div className="text-secondary">{item.artist}</div>
                         </div>
                       </div>
-                    </div>
-                    <div>
-                      <h3 className="tw:text-lg tw:font-semibold tw:text-white">{item.title}</h3>
-                      <p className="tw:text-gray-400">{item.artist}</p>
-                    </div>
-                  </div>
-                  <button 
-                    className="tw:p-2 tw:opacity-70 hover:tw:opacity-100 tw:transition-opacity tw:duration-300"
-                    onClick={() => toggleFavorite(item.id)}
-                  >
-                    <Heart 
-                      size={24} 
-                      fill={isFavorite ? "#dc2626" : "none"} 
-                      color={isFavorite ? "#dc2626" : "white"} 
-                      className={isFavorite ? "tw:animate-pulse" : ""}
-                    />
-                  </button>
-                </div>
-              );
-            })}
-          </div>
+                    </td>
+                    <td className="py-4 text-secondary fs-6">{item.album}</td>
+                    <td className="py-4 text-end text-secondary fs-6 pe-4">{item.duration}</td>
+                    <td className="py-3 text-end position-relative pe-2" style={{ width: '50px' }}>
+                      <button 
+                        className="btn btn-link p-2"
+                        style={{ 
+                          opacity: 0.75,
+                          transition: 'all 0.3s ease',
+                          transform: 'scale(1)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          marginLeft: 'auto'
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.opacity = 1;
+                          e.currentTarget.style.transform = 'scale(1.1)';
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.opacity = 0.75;
+                          e.currentTarget.style.transform = 'scale(1)';
+                        }}
+                        onClick={() => toggleFavorite(item.id)}
+                      >
+                        <Heart 
+                          size={24} 
+                          fill={isFavorite ? "#dc3545" : "none"} 
+                          color={isFavorite ? "#dc3545" : "white"} 
+                          className={isFavorite ? "animate-pulse" : ""}
+                        />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
+
+      {/* CSS for hover effects */}
+      <style jsx>{`
+        .song-number {
+          transition: all 0.3s ease;
+        }
+        tr:hover .song-number {
+          opacity: 0;
+        }
+        tr:hover .song-title {
+          color: #f87171 !important;
+          text-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
+        }
+        tr:hover .cover-overlay {
+          opacity: 1 !important;
+        }
+        tr:hover .play-button-mini {
+          transform: scale(1) !important;
+          transition: all 0.3s ease;
+        }
+        .cover-overlay {
+          opacity: 0;
+          transition: all 0.3s ease;
+        }
+        .trending-item:hover .cover-overlay {
+          opacity: 1 !important;
+        }
+        .trending-item:hover .play-button-mini {
+          transform: scale(1) !important;
+        }
+      `}</style>
     </div>
   );
 };
 
-export default MusicSearch;
+export default SearchPage;

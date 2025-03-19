@@ -10,11 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.0.13",
+    "bootstrap": "^5.3.3",
     "framer-motion": "^12.5.0",
     "lucide-react": "^0.479.0",
     "melody-app": "file:",
     "react": "^19.0.0",
+    "react-bootstrap": "^2.10.9",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
@@ -26,7 +27,6 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
-    "tailwindcss": "^4.0.14",
     "vite": "^6.2.0"
   }
 }
