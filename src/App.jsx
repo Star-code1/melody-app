@@ -4,6 +4,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { Row, Col } from 'react-bootstrap';
 import Sidebar from './components/Sidebar';
 import Page from './components/Page';
+import Header from './components/Header'
+import Player from './components/Player'
 
 function App() {
   return (
