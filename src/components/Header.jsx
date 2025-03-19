@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, UserCircle, User, LogOut, Settings, Heart, Clock, Download } from 'lucide-react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Header = ({ isLoggedIn = false }) => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -8,92 +9,203 @@ const Header = ({ isLoggedIn = false }) => {
     setIsUserMenuOpen(!isUserMenuOpen);
   };
 
+  // Custom styles for Bootstrap
+  const customStyles = {
+    header: {
+      background: 'linear-gradient(to bottom, #1e3a8a, #115e59)',
+      padding: '16px',
+    },
+    navButton: {
+      backgroundColor: '#fff',
+      borderRadius: '50%',
+      padding: '8px',
+      border: 'none',
+      transition: 'background-color 0.2s'
+    },
+    userMenu: {
+      position: 'absolute',
+      right: 0,
+      marginTop: '8px',
+      width: '200px',
+      borderRadius: '6px',
+      backgroundColor: '#343a40',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      zIndex: 1000
+    },
+    menuItem: {
+      display: 'flex',
+      alignItems: 'center',
+      padding: '8px 16px',
+      fontSize: '14px',
+      color: '#dee2e6',
+      textDecoration: 'none',
+      transition: 'background-color 0.2s'
+    },
+    menuItemHover: {
+      backgroundColor: '#495057'
+    },
+    signupButton: {
+      padding: '8px 16px',
+      borderRadius: '50px',
+      backgroundColor: 'transparent',
+      border: '1px solid white',
+      color: 'white',
+      transition: 'background-color 0.2s, transform 0.2s'
+    },
+    loginButton: {
+      padding: '8px 16px',
+      borderRadius: '50px',
+      backgroundColor: 'white',
+      color: 'black',
+      border: 'none',
+      fontWeight: '500',
+      transition: 'transform 0.2s'
+    }
+  };
+
   return (
-    <div className="w-full p-4 flex items-center bg-gradient-to-b from-blue-900 to-teal-900 text-white">
+    <div style={customStyles.header} className="d-flex align-items-center justify-content-between">
       {/* Left side - Navigation arrows */}
-      <div className="flex gap-2">
-        <button className="bg-black bg-opacity-30 rounded-full p-2 hover:bg-opacity-50 transition">
+      <div className="d-flex gap-2">
+        <button style={customStyles.navButton} className="btn">
           <ChevronLeft size={20} />
         </button>
-        <button className="bg-black bg-opacity-30 rounded-full p-2 hover:bg-opacity-50 transition">
+        <button style={customStyles.navButton} className="btn">
           <ChevronRight size={20} />
         </button>
       </div>
 
+      {/* Middle section - could be a search bar or title */}
+      <div className="flex-grow-1"></div>
 
       {/* Right side - Authentication */}
-      <div className="flex items-center">
+      <div>
         {isLoggedIn ? (
-          <div className="relative">
+          <div className="position-relative">
             <button 
               onClick={toggleUserMenu}
-              className="bg-black bg-opacity-30 rounded-full p-2 hover:bg-opacity-50 transition"
+              style={customStyles.navButton}
+              className="btn"
             >
               <UserCircle size={20} />
             </button>
 
             {/* User dropdown menu */}
             {isUserMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5">
-              <div className="py-1" role="menu">
-                <a
-                  href="#"
-                  className="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                  role="menuitem"
-                >
-                  <User className="mr-2 h-4 w-4" />
-                  Hồ sơ cá nhân
-                </a>
-                <a
-                  href="#"
-                  className="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                  role="menuitem"
-                >
-                  <Heart className="mr-2 h-4 w-4" />
-                  Bài hát yêu thích
-                </a>
-                <a
-                  href="#"
-                  className="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                  role="menuitem"
-                >
-                  <Clock className="mr-2 h-4 w-4" />
-                  Nghe gần đây
-                </a>
-                <a
-                  href="#"
-                  className="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                  role="menuitem"
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Tải xuống
-                </a>
-                <a
-                  href="#"
-                  className="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                  role="menuitem"
-                >
-                  <Settings className="mr-2 h-4 w-4" />
-                  Cài đặt
-                </a>
-                <a
-                  href="#"
-                  className="flex items-center px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                  role="menuitem"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Đăng xuất
-                </a>
+              <div style={customStyles.userMenu}>
+                <div className="py-1">
+                  <a
+                    href="#"
+                    style={customStyles.menuItem}
+                    className="d-flex align-items-center"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = customStyles.menuItemHover.backgroundColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '';
+                    }}
+                  >
+                    <User className="me-2" size={16} />
+                    Hồ sơ cá nhân
+                  </a>
+                  <a
+                    href="#"
+                    style={customStyles.menuItem}
+                    className="d-flex align-items-center"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = customStyles.menuItemHover.backgroundColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '';
+                    }}
+                  >
+                    <Heart className="me-2" size={16} />
+                    Bài hát yêu thích
+                  </a>
+                  <a
+                    href="#"
+                    style={customStyles.menuItem}
+                    className="d-flex align-items-center"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = customStyles.menuItemHover.backgroundColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '';
+                    }}
+                  >
+                    <Clock className="me-2" size={16} />
+                    Nghe gần đây
+                  </a>
+                  <a
+                    href="#"
+                    style={customStyles.menuItem}
+                    className="d-flex align-items-center"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = customStyles.menuItemHover.backgroundColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '';
+                    }}
+                  >
+                    <Download className="me-2" size={16} />
+                    Tải xuống
+                  </a>
+                  <a
+                    href="#"
+                    style={customStyles.menuItem}
+                    className="d-flex align-items-center"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = customStyles.menuItemHover.backgroundColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '';
+                    }}
+                  >
+                    <Settings className="me-2" size={16} />
+                    Cài đặt
+                  </a>
+                  <a
+                    href="#"
+                    style={customStyles.menuItem}
+                    className="d-flex align-items-center"
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = customStyles.menuItemHover.backgroundColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '';
+                    }}
+                  >
+                    <LogOut className="me-2" size={16} />
+                    Đăng xuất
+                  </a>
+                </div>
               </div>
-            </div>
-          )}
+            )}
           </div>
         ) : (
-          <div className="flex gap-3">
-            <button className="px-4 py-2 rounded-full bg-transparent border border-white text-white hover:bg-white hover:text-black hover:bg-opacity-10 transition">
+          <div className="d-flex gap-3">
+            <button 
+              style={customStyles.signupButton}
+              className="btn"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            >
               Đăng ký
             </button>
-            <button className="px-4 py-2 rounded-full bg-white text-black font-medium hover:scale-105 transition">
+            <button 
+              style={customStyles.loginButton}
+              className="btn"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+            >
               Đăng nhập
             </button>
           </div>

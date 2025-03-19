@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Volume2, Volume1, VolumeX, Repeat, Shuffle, Heart } from 'lucide-react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Player = () => {
   // State cho trình phát nhạc
@@ -20,12 +21,12 @@ const Player = () => {
   const playlist = [
     {
       id: 1,
-      title: "đuawd",
-      artist: "dưad",
-      album: "đawdf",
+      title: "Tên bài hát",
+      artist: "Ca sĩ",
+      album: "Album",
       coverUrl: "", // Ảnh placeholder
-      audioUrl: "" // Nhạc mẫu
-    }
+      audioUrl: "src/assets/bài hát" // Nhạc mẫu
+    },
   ];
   
   const currentSong = playlist[currentSongIndex];
@@ -178,118 +179,189 @@ const Player = () => {
       audio.removeEventListener('ended', handleEnded);
     };
   }, [isRepeat]);
+
+  // Custom styles for Bootstrap
+  const customStyles = {
+    playerContainer: {
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: '#212529',
+      borderTop: '1px solid #343a40',
+      padding: '15px'
+    },
+    coverImage: {
+      width: '56px',
+      height: '56px',
+      borderRadius: '4px',
+      marginRight: '12px'
+    },
+    songTitle: {
+      color: 'white',
+      fontSize: '14px',
+      fontWeight: '500',
+      margin: 0
+    },
+    songArtist: {
+      color: '#adb5bd',
+      fontSize: '12px',
+      margin: 0
+    },
+    playButton: {
+      backgroundColor: 'white',
+      borderRadius: '50%',
+      padding: '8px',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      border: 'none',
+      transition: 'transform 0.2s'
+    },
+    controlButton: {
+      background: 'none',
+      border: 'none',
+      color: '#adb5bd',
+      padding: '4px',
+      margin: '0 8px'
+    },
+    activeButton: {
+      color: '#198754' // Bootstrap green
+    },
+    likedButton: {
+      fill: '#dc3545', // Bootstrap red
+      color: '#dc3545'
+    },
+    timeText: {
+      color: '#adb5bd',
+      fontSize: '12px',
+      width: '40px'
+    }
+  };
   
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 px-4 py-3">
+    <div style={customStyles.playerContainer}>
       {/* Audio element ẩn */}
       <audio ref={audioRef} preload="metadata" />
       
-      <div className="flex items-center justify-between">
-        {/* Thông tin bài hát */}
-        <div className="flex items-center w-1/4">
-          <img 
-            src={currentSong.coverUrl} 
-            alt={`${currentSong.title} cover`} 
-            className="w-14 h-14 rounded mr-3"
-          />
-          <div>
-            <div className="text-white text-sm font-medium">{currentSong.title}</div>
-            <div className="text-gray-400 text-xs">{currentSong.artist}</div>
-          </div>
-          <button 
-            className="ml-4" 
-            onClick={toggleLike}
-          >
-            <Heart 
-              className={`h-5 w-5 ${liked ? 'text-black-500 fill-red-500' : 'text-white-400'}`} 
+      <div className="container-fluid">
+        <div className="row align-items-center">
+          {/* Thông tin bài hát */}
+          <div className="col-md-3 d-flex align-items-center">
+            <img 
+              src={currentSong.coverUrl} 
+              alt={`${currentSong.title} cover`} 
+              style={customStyles.coverImage}
             />
-          </button>
-        </div>
-        
-        {/* Điều khiển phát nhạc */}
-        <div className="flex flex-col items-center justify-center w-2/4">
-          <div className="flex items-center justify-center mb-2">
-            {/* Nút shuffle bài hát */}
+            <div>
+              <p style={customStyles.songTitle}>{currentSong.title}</p>
+              <p style={customStyles.songArtist}>{currentSong.artist}</p>
+            </div>
             <button 
-              className={`mx-2 ${isShuffle ? 'text-green-500' : 'text-white-400'} hover:text-white`}
-              onClick={toggleShuffle}
+              className="ms-3" 
+              onClick={toggleLike}
+              style={{...customStyles.controlButton, ...(liked ? customStyles.likedButton : {})}}
             >
-              <Shuffle className="h-4 w-4" />
-            </button>
-
-            {/* Nút quay lại bài trước */}
-            <button 
-              className="mx-2 text-white-400 hover:text-white"
-              onClick={playPreviousSong}
-            >
-              <SkipBack className="h-5 w-5" />
-            </button>
-
-            {/* Nút play/pause */}
-            <button 
-              className="mx-2 bg-white rounded-full p-2 hover:scale-105 transition"
-              onClick={togglePlay}
-            >
-              {isPlaying ? 
-                <Pause className="h-5 w-5 text-black fill-black" /> : 
-                <Play className="h-5 w-5 text-black fill-black" />
-              }
-            </button>
-
-            {/* Nút chuyển bài tiếp theo */}
-            <button 
-              className="mx-2 text-white-400 hover:text-white"
-              onClick={playNextSong}
-            >
-              <SkipForward className="h-5 w-5" />
-            </button>
-
-            {/* Nút lặp lại bài hát */}
-            <button 
-              className={`mx-2 ${isRepeat ? 'text-green-500' : 'text-white-400'} hover:text-white`}
-              onClick={toggleRepeat}
-            >
-              <Repeat className="h-4 w-4" />
+              <Heart size={20} />
             </button>
           </div>
           
-          {/* Thanh tiến trình */}
-          <div className="w-full flex items-center">
-            <span className="text-xs text-gray-400 w-10 text-right mr-2">
-              {formatTime(currentTime)}
-            </span>
-            <input
-              type="range"
-              min="0"
-              max={duration || 0}
-              value={currentTime}
-              onChange={handleProgressChange}
-              className="flex-grow h-1 rounded-lg appearance-none bg-gray-600"
-            />
-            <span className="text-xs text-gray-400 w-10 text-left ml-2">
-              {formatTime(duration)}
-            </span>
+          {/* Điều khiển phát nhạc */}
+          <div className="col-md-6">
+            <div className="d-flex justify-content-center align-items-center mb-2">
+              {/* Nút shuffle bài hát */}
+              <button 
+                style={{
+                  ...customStyles.controlButton,
+                  ...(isShuffle ? customStyles.activeButton : {})
+                }}
+                onClick={toggleShuffle}
+              >
+                <Shuffle size={16} />
+              </button>
+
+              {/* Nút quay lại bài trước */}
+              <button 
+                style={customStyles.controlButton}
+                onClick={playPreviousSong}
+              >
+                <SkipBack size={20} />
+              </button>
+
+              {/* Nút play/pause */}
+              <button 
+                style={customStyles.playButton}
+                onClick={togglePlay}
+                className="mx-2"
+              >
+                {isPlaying ? 
+                  <Pause size={20} color="black" /> : 
+                  <Play size={20} color="black" />
+                }
+              </button>
+
+              {/* Nút chuyển bài tiếp theo */}
+              <button 
+                style={customStyles.controlButton}
+                onClick={playNextSong}
+              >
+                <SkipForward size={20} />
+              </button>
+
+              {/* Nút lặp lại bài hát */}
+              <button 
+                style={{
+                  ...customStyles.controlButton,
+                  ...(isRepeat ? customStyles.activeButton : {})
+                }}
+                onClick={toggleRepeat}
+              >
+                <Repeat size={16} />
+              </button>
+            </div>
+            
+            {/* Thanh tiến trình */}
+            <div className="d-flex align-items-center">
+              <span style={{...customStyles.timeText, textAlign: 'right'}} className="me-2">
+                {formatTime(currentTime)}
+              </span>
+              <div className="flex-grow-1">
+                <input
+                  type="range"
+                  className="form-range"
+                  min="0"
+                  max={duration || 0}
+                  value={currentTime}
+                  onChange={handleProgressChange}
+                />
+              </div>
+              <span style={{...customStyles.timeText, textAlign: 'left'}} className="ms-2">
+                {formatTime(duration)}
+              </span>
+            </div>
           </div>
-        </div>
-        
-        {/* Điều khiển âm lượng */}
-        <div className="flex items-center justify-end w-1/4">
-          <button onClick={toggleMute} className="mr-2 text-gray-400 hover:text-white">
-            {isMuted || volume === 0 ? 
-              <VolumeX className="h-5 w-5" /> : 
-              volume < 50 ? 
-                <Volume1 className="h-5 w-5" /> : 
-                <Volume2 className="h-5 w-5" />
-            }
-          </button>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={isMuted ? 0 : volume}
-            onChange={handleVolumeChange}
-            className="w-24 h-1 rounded-lg appearance-none bg-gray-600"
-          />
+          
+          {/* Điều khiển âm lượng */}
+          <div className="col-md-3 d-flex justify-content-end align-items-center">
+            <button onClick={toggleMute} style={customStyles.controlButton} className="me-2">
+              {isMuted || volume === 0 ? 
+                <VolumeX size={20} /> : 
+                volume < 50 ? 
+                  <Volume1 size={20} /> : 
+                  <Volume2 size={20} />
+              }
+            </button>
+            <div style={{ width: '100px' }}>
+              <input
+                type="range"
+                className="form-range"
+                min="0"
+                max="100"
+                value={isMuted ? 0 : volume}
+                onChange={handleVolumeChange}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
