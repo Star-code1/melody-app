@@ -134,4 +134,28 @@ router.put("/update-profile", async (req, res) => {
     }
 });
 
+// ✅ API đăng nhập google (Không dùng bcrypt và JWT)
+router.post("/google-login", async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        // Kiểm tra xem email có tồn tại không
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: "Tên người dùng hoặc mật khẩu không đúng." });
+        }
+        // Loại bỏ mật khẩu trước khi trả về
+        const { password: _, ...userData } = user.toObject();
+
+        res.status(200).json({
+            message: "Đăng nhập thành công!",
+            user: userData, // Trả về toàn bộ thông tin trừ mật khẩu
+        });
+    } catch (error) {
+        console.error("Lỗi server khi đăng nhập:", error);
+        res.status(500).json({ message: "Lỗi server", error });
+    }
+});
+
+
 module.exports = router;

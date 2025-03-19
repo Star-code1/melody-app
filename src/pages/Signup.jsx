@@ -9,36 +9,37 @@ import axios from "axios";
 import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 
 function GoogleSignupButton({ onSuccess }) {
-  const login = useGoogleLogin({
-      onSuccess: (response) => {
-          console.log("Login Success:", response);
-          if (onSuccess) {
-              onSuccess(response);
-          }
-      },
-      onError: (error) => {
-          console.error("Login Failed:", error);
-      },
-  });
+    const login = useGoogleLogin({
+        onSuccess: (response) => {
+            console.log("Login Success:", response);
+            if (onSuccess) {
+                onSuccess(response);
+            }
+        },
+        onError: (error) => {
+            console.error("Login Failed:", error);
+        },
+    });
 
-  return (
-      <Button
-          variant="light"
-          className="w-100 mb-3"
-          style={{ borderRadius: "30px" }}
-          onClick={() => login()}
-      >
-          <img
-              src={google_icon}
-              alt="Google Logo"
-              width="20"
-              height="20"
-              className="me-2"
-          />
-          Đăng ký bằng Google
-      </Button>
-  );
+    return (
+        <Button
+            variant="light"
+            className="w-100 mb-3"
+            style={{ borderRadius: "30px" }}
+            onClick={() => login()}
+        >
+            <img
+                src={google_icon}
+                alt="Google Logo"
+                width="20"
+                height="20"
+                className="me-2"
+            />
+            Đăng ký bằng Google
+        </Button>
+    );
 }
+
 function Signup() {
   const [step, setStep] = useState(1);
   const [show, setShow] = useState(false);
@@ -85,9 +86,9 @@ function Signup() {
         return -1;
     }
   };
+  
   const handleGoogleLogin = async (response) => {
       try {
-          // Kiểm tra xem có nhận được access_token từ response không
           if (!response || !response.access_token) {
               console.error("Google login error: No access token received");
               alert("Không nhận được thông tin đăng nhập từ Google.");
@@ -103,32 +104,59 @@ function Signup() {
               },
           });
 
-          const { email, name } = userInfoResponse.data;  // Lấy thông tin email và name từ response
+          const { email, name, gender, birthdate } = userInfoResponse.data;  
 
-          const result = await isValidateEmail(email);
+          if (!email) {
+              console.error("Google login error: No email found in the user data");
+              alert("Không tìm thấy email trong thông tin đăng nhập.");
+              return;
+          }
 
-        if (result < 2) {
-            // Nếu email không hợp lệ hoặc đã tồn tại
-            if (result === 0) {
-                alert("Email không hợp lệ.");
-            } else if (result === 1) {
-                alert("Email đã được sử dụng.");
-            }
-        } else {
-            setFormData((prevFormData) => ({
-                ...prevFormData,
-                email: email,  // Cập nhật email vào formData
-                name: name,    // Cập nhật name vào formData nếu cần
-            }));
-            setEmailError("");
-            setShow(true); // Hiển thị giao diện nếu email hợp lệ
-        }
+          // Kiểm tra email có tồn tại trong hệ thống chưa
+          const checkEmailResponse = await axios.get(`http://localhost:5000/api/users/check-email?email=${email}`);
 
+          if (checkEmailResponse.data.exists) {
+              // Email đã tồn tại => Đăng nhập bình thường
+              const loginResponse = await axios.post("http://localhost:5000/api/users/google-login", { email });
+
+              if (loginResponse.status === 200) {
+                  localStorage.setItem("token", JSON.stringify(loginResponse.data.user));
+                  alert("Tài khoản đã tồn tại ! Đang đăng nhập...");
+                  navigate("/");
+              } else {
+                  console.error("Server login error:", loginResponse.data);
+                  alert("Đăng nhập không thành công. Vui lòng thử lại.");
+              }
+          } else {
+              // Email chưa tồn tại => Tiến hành đăng ký
+              const registerResponse = await axios.post("http://localhost:5000/api/users/", {
+                  email,
+                  name,
+                  gender: "Nam",
+                  birthDate: { day: 1, month: 1, year: 2000 },
+                  password: "google_oauth", // Đặt mật khẩu mặc định, không sử dụng thực tế
+                  agreeMarketing: true,
+                  agreeSharing: true,
+                  songs: [],
+                  favoriteSongs: [],
+              });
+
+              if (registerResponse.status === 201) {
+                  localStorage.setItem("token", JSON.stringify(registerResponse.data));
+                  alert("Tạo tài khoản thành công! Đang đăng nhập...");
+                  navigate("/");
+              } else {
+                  console.error("Server register error:", registerResponse.data);
+                  alert("Đăng ký không thành công. Vui lòng thử lại.");
+              }
+          }
       } catch (error) {
           console.error("Google login error:", error);
           alert("Đăng nhập bằng Google thất bại. Vui lòng thử lại.");
       }
   };
+
+
   const handleShow = async () => {
     const result = await isValidateEmail(formData.email);
     if (result < 2) {
@@ -290,6 +318,21 @@ function Signup() {
           >
             Tiếp theo
           </Button>
+
+
+          <div className="position-relative my-4">
+                <hr />
+                <span className="position-absolute top-50 start-50 translate-middle px-3 bg-dark text-white">
+                    Hoặc
+                </span>
+            </div>
+          <Form.Group className="mb-3">
+            <GoogleOAuthProvider clientId={CLIENT_ID}>
+                <div className="d-flex justify-content-center mt-5">
+                  <GoogleSignupButton onSuccess={handleGoogleLogin}/>
+                </div>
+            </GoogleOAuthProvider>
+          </Form.Group>
           
           <p className="text-white-50 text-center mt-3">Bạn đã có tài khoản? <span
             style={{ color: "white", textDecoration: "underline", cursor: "pointer" }}

@@ -7,6 +7,39 @@ import facebook_icon from "../assets/icons8-facebook-logo.svg";
 import { useNavigate } from "react-router-dom";
 import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
+function GoogleLoginButton({ onSuccess }) {
+    
+    const login = useGoogleLogin({
+        onSuccess: (response) => {
+            console.log("Login Success:", response);
+            if (onSuccess) {
+                onSuccess(response);
+            }
+        },
+        onError: (error) => {
+            console.error("Login Failed:", error);
+        },
+    });
+
+    return (
+        <Button
+            variant="light"
+            className="w-100 mb-3"
+            style={{ borderRadius: "30px" }}
+            onClick={() => login()}
+        >
+            <img
+                src={google_icon}
+                alt="Google Logo"
+                width="20"
+                height="20"
+                className="me-2"
+            />
+            Đăng nhập bằng Google
+        </Button>
+    );
+}
+
 function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -38,12 +71,97 @@ function Login() {
             setError("Tên người dùng hoặc mật khẩu không đúng.");
         }
     }
+
+    const handleGoogleLogin = async (response) => {
+        try {
+            if (!response || !response.access_token) {
+                console.error("Google login error: No access token received");
+                alert("Không nhận được thông tin đăng nhập từ Google.");
+                return;
+            }
+    
+            const { access_token } = response;
+    
+            // Gửi yêu cầu tới Google API để lấy thông tin người dùng
+            const userInfoResponse = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+                headers: {
+                    Authorization: `Bearer ${access_token}`,
+                },
+            });
+    
+            const { email, name, gender, birthdate } = userInfoResponse.data;  
+    
+            if (!email) {
+                console.error("Google login error: No email found in the user data");
+                alert("Không tìm thấy email trong thông tin đăng nhập.");
+                return;
+            }
+    
+            // Kiểm tra email có tồn tại trong hệ thống chưa
+            const checkEmailResponse = await axios.get(`http://localhost:5000/api/users/check-email?email=${email}`);
+    
+            if (checkEmailResponse.data.exists) {
+                // Email đã tồn tại => Đăng nhập bình thường
+                const loginResponse = await axios.post("http://localhost:5000/api/users/google-login", { email });
+    
+                if (loginResponse.status === 200) {
+                    localStorage.setItem("token", JSON.stringify(loginResponse.data.user));
+                    alert("Đăng nhập thành công!");
+                    navigate("/");
+                } else {
+                    console.error("Server login error:", loginResponse.data);
+                    alert("Đăng nhập không thành công. Vui lòng thử lại.");
+                }
+            } else {
+
+                // Email chưa tồn tại => Tiến hành đăng ký
+                const registerResponse = await axios.post("http://localhost:5000/api/users/", {
+                    email,
+                    name,
+                    gender: "Nam",
+                    birthDate: { day: 1, month: 1, year: 2000 },
+                    password: "google_oauth", // Đặt mật khẩu mặc định, không sử dụng thực tế
+                    agreeMarketing: true,
+                    agreeSharing: true,
+                    songs: [],
+                    favoriteSongs: [],
+                });
+    
+                if (registerResponse.status === 201) {
+                    localStorage.setItem("token", JSON.stringify(registerResponse.data));
+                    alert("Tạo tài khoản thành công! Đang đăng nhập...");
+                    navigate("/");
+                } else {
+                    console.error("Server register error:", registerResponse.data);
+                    alert("Đăng ký không thành công. Vui lòng thử lại.");
+                }
+            }
+        } catch (error) {
+            console.error("Google login error:", error);
+            alert("Đăng nhập bằng Google thất bại. Vui lòng thử lại.");
+        }
+    };
+
+
     return (
             <Container className="d-flex align-items-center justify-content-center bg-dark text-white" style={{ height: "700px",width: "500px",borderRadius: "10px" }}>
             <div className="w-100" style={{ maxWidth: "400px" }}>
                 <h2 className="text-center mb-4">Đăng nhập</h2>
                 <Form onSubmit={handleLogin}>
-                
+                <Form.Group className="mb-3">
+                    <GoogleOAuthProvider clientId={CLIENT_ID}>
+                        <div className="d-flex justify-content-center mt-5">
+                            <GoogleLoginButton onSuccess={handleGoogleLogin}/>
+                        </div>
+                    </GoogleOAuthProvider>
+                </Form.Group>
+                <div className="position-relative my-4">
+                    <hr />
+                    <span className="position-absolute top-50 start-50 translate-middle px-3 bg-dark text-white">
+                        Hoặc
+                    </span>
+                </div>
+
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                     <Form.Label className="text-start  w-100" style={{fontWeight: "bold"}}>Email hoặc tên người dùng</Form.Label>
                     <Form.Control
