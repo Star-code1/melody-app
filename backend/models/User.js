@@ -1,19 +1,23 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema({
-    username: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    songIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Song' }],
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
+    password: { type: String, required: false },
     birthDate: {
-        day: { type: Number, required: true },
-        month: { type: Number, required: true },
-        year: { type: Number, required: true },
+        day: { type: Number, required: false },
+        month: { type: Number, required: false },
+        year: { type: Number, required: false },
     },
-    gender: { type: String, required: true },
+    gender: { type: String, default: "unknown" },
     agreeMarketing: { type: Boolean, default: false },
     agreeSharing: { type: Boolean, default: false },
+
+    // Mảng chứa danh sách bài hát của người dùng
+    songs: { type: mongoose.Schema.Types.Mixed, default: [] }, // Cho phép lưu bất kỳ dữ liệu gì
+
+    // Mảng chứa danh sách bài hát yêu thích của người dùng
+    favoriteSongs: { type: mongoose.Schema.Types.Mixed, default: [] }, // Cho phép lưu bất kỳ dữ liệu gì
 });
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("User", UserSchema);
