@@ -3,9 +3,9 @@ import { Modal, Button, Form, Toast, ToastContainer } from "react-bootstrap";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { AiFillHome } from "react-icons/ai";
-import { FaSearch } from "react-icons/fa";
-import { FaMusic } from "react-icons/fa6";
+import { FaHeart, FaSearch } from "react-icons/fa";
 import { FaList } from "react-icons/fa";
+import { FaMusic } from "react-icons/fa6";
 import { BsFillMusicPlayerFill, BsMusicNote } from "react-icons/bs";
 import { BiImage } from "react-icons/bi";
 import "./Sidebar.scss"; // Make sure to create this SCSS file
@@ -78,11 +78,12 @@ function Sidebar() {
     <div className="sidebar">
       <div className="sidebar-section">
         <SidebarItem to="/" icon={<AiFillHome />} text="Trang chủ" />
-        <SidebarItem to="/Search" icon={<FaSearch />} text="Tìm kiếm" />
+        <SidebarItem to="/SearchPage" icon={<FaSearch />} text="Tìm kiếm" />
       </div>
       
       <div className="sidebar-section">
         <SidebarItem icon={<FaMusic />} text="Thêm bài hát" onClick={handleShow} />
+        <SidebarItem to="/LikedSongsPage" icon={<FaHeart />} text="Nhạc yêu thích" />
         <SidebarItem to="/MySong" icon={<FaList />} text="Nhạc của tôi" />
       </div>
 

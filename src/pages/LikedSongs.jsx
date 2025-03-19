@@ -95,7 +95,7 @@ const LikedSongsPage = () => {
 
       {/* Player Controls */}
       <div className="px-4 py-3 d-flex align-items-center" style={customStyles.gradientNavbar}>
-        <button className="btn rounded-circle d-flex align-items-center justify-content-center me-3" 
+        <button className="btn rounded d-flex align-items-center justify-content-center me-3" 
                 style={customStyles.playButton}
                 onMouseOver={(e) => {
                   e.currentTarget.style.backgroundColor = '#ef4444';

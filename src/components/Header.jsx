@@ -12,7 +12,7 @@ const Header = ({ isLoggedIn = false }) => {
   // Custom styles for Bootstrap
   const customStyles = {
     header: {
-      background: 'linear-gradient(to bottom, #1e3a8a, #115e59)',
+      background: 'linear-gradient(to right,rgb(71, 57, 70),rgb(6, 24, 98))',
       padding: '16px',
     },
     navButton: {

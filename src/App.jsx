@@ -10,7 +10,7 @@ import Player from './components/Player'
 function App() {
   return (
     <BrowserRouter basename="/Melody"> 
-      <div className='container-fluid vw-100 vh-100' >
+      <div className='container-fluid vh-100' >
         <Row>
           <Col style={{ flex: "0.25", padding: "0" }}>
             <Sidebar />
@@ -24,16 +24,5 @@ function App() {
       <Player></Player>
     </BrowserRouter>
   );
-import LikedSongsPage from './pages/LikedSongs'
-import SearchPage from './pages/SearchPage'
-
-function App() {
-  return (
-    <>
-      <LikedSongsPage />
-      <SearchPage />
-    </>
-  )
 }
-
 export default App;
