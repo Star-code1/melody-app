@@ -27,11 +27,23 @@ const ProfileModal = ({ showModal, setShowModal }) => {
   }, [token, navigate]);
 
   const handleSave = async () => {
+    const validDay = day === "" ? 1 : day;
+    const validMonth = month === "" ? 1 : month;
+    const validYear = year === "" || year < 1900 ? 1900 : year;
+
+    setDay(validDay);
+    setMonth(validMonth);
+    setYear(validYear);
+
     const updatedProfile = {
       name: username,
       email,
       gender,
-      birthDate: { day, month, year },
+      birthDate: { 
+        day: validDay, 
+        month: validMonth, 
+        year: validYear 
+      },
       agreeMarketing: shareData,
     };
 
@@ -43,7 +55,11 @@ const ProfileModal = ({ showModal, setShowModal }) => {
         userData.name = username;
         userData.email = email;
         userData.gender = gender;
-        userData.birthDate = { day, month, year };
+        userData.birthDate = { 
+          day: validDay, 
+          month: validMonth, 
+          year: validYear 
+        };
         userData.agreeMarketing = shareData;
   
         // Save the updated token back to localStorage
@@ -67,7 +83,7 @@ const ProfileModal = ({ showModal, setShowModal }) => {
   };
 
   return (
-    <Modal show={showModal} onHide={() => setShowModal(false)} centered  size="xl">
+    <Modal show={showModal} onHide={() => setShowModal(false)} centered  size="lg">
       <Modal.Header closeButton className=" text-white p-5 " style={{ backgroundColor: "#121212" }}>
         
         <Modal.Title className="fw-bold">Thông tin cá nhân</Modal.Title>
@@ -113,7 +129,17 @@ const ProfileModal = ({ showModal, setShowModal }) => {
                   min="1"
                   max="31"
                   value={day}
-                  onChange={(e) => setDay(e.target.value)}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    if (newValue === "") {
+                      setDay(""); // Đặt lại giá trị thành 1 nếu người dùng xóa hết
+                    } else {
+                      const parsedValue = parseInt(newValue, 10);
+                      if (!isNaN(parsedValue) && parsedValue >= 1 && parsedValue <= 31) {
+                        setDay(parsedValue);
+                      }
+                    }
+                  }}
                   className="bg-dark text-white border-0 p-3 rounded-3"
                 />
               </Col>
@@ -123,7 +149,17 @@ const ProfileModal = ({ showModal, setShowModal }) => {
                   min="1"
                   max="12"
                   value={month}
-                  onChange={(e) => setMonth(e.target.value)}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    if (newValue === "") {
+                      setMonth(""); // Nếu trống, đặt lại 1 ngay lập tức
+                    } else {
+                      const parsedValue = parseInt(newValue, 10);
+                      if (!isNaN(parsedValue) && parsedValue >= 1 && parsedValue <= 12) {
+                        setMonth(parsedValue);
+                      }
+                    }
+                  }}
                   className="bg-dark text-white border-0 p-3 rounded-3"
                 />
               </Col>
@@ -134,9 +170,14 @@ const ProfileModal = ({ showModal, setShowModal }) => {
                   max="2025"
                   value={year}
                   onChange={(e) => {
-                    const newValue = parseInt(e.target.value, 10);
-                    if (!isNaN(newValue) && newValue >= 1900 && newValue <= 2025) {
-                      setYear(newValue);
+                    const newValue = e.target.value;
+                    if (newValue === "") {
+                      setYear(""); // Cho phép xóa nhưng không đặt ngay 1900
+                    } else {
+                      const parsedValue = parseInt(newValue, 10);
+                      if (!isNaN(parsedValue) && parsedValue >= 1 && parsedValue <= 2025) {
+                        setYear(parsedValue);
+                      }
                     }
                   }}
                   className="bg-dark text-white border-0 p-3 rounded-3"
