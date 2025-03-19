@@ -1,4 +1,5 @@
 require("dotenv").config({ path: __dirname + "/.env" });// Chỉ định đường dẫn tuyệt đối đến .env
+const path = require("path");
 
 console.log("🔍 MONGO_URI:", process.env.MONGO_URI); // Debug xem biến có bị undefined không
 
@@ -25,7 +26,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/songs", songRoutes);
 const userRoutes = require("./routes/userRoutes");
 app.use("/api/users", userRoutes);
-
+// Serve static files from the uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.get("/", (req, res) => {
   res.send("Welcome to Melody App API!");
 });

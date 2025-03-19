@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const Song = require('../models/Song');
+const User = require('../models/User');
 
 // Cấu hình lưu file
 const storage = multer.diskStorage({
@@ -38,20 +39,65 @@ router.post('/upload', upload.fields([
             return res.status(400).json({ error: 'Cần có cả file nhạc và ảnh bìa!' });
         }
 
+        // Kiểm tra userId trong request body
+        const userId = req.body.userId;
+        if (!userId) {
+            return res.status(400).json({ error: 'Cần cung cấp ID người dùng!' });
+        }
+
+        // Tạo bài hát mới
         const song = new Song({
             title: req.body.title,
             description: req.body.description || '',
-            artist: req.body.artist,  // Đảm bảo khớp với frontend
+            artist: req.body.artist,
             audioPath: req.files['audioFile'][0].path,
             imagePath: req.files['imageFile'][0].path,
+            uploader: userId, // Liên kết bài hát với user
         });
 
-        await song.save();
-        res.status(201).json(song);
+        // Lưu bài hát
+        const savedSong = await song.save();
+
+        // Thêm ID bài hát vào danh sách songs của user
+        await User.findByIdAndUpdate(
+            userId,
+            { $push: { songs: savedSong._id } },
+            { new: true }
+        );
+
+        res.status(201).json(savedSong);
     } catch (err) {
+        console.error('Lỗi khi upload bài hát:', err);
         res.status(400).json({ error: err.message });
     }
 });
 
+// API lấy bài hát của một user cụ thể
+router.get('/user/:userId', async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const user = await User.findById(userId).populate('songs');
+        
+        if (!user) {
+            return res.status(404).json({ error: 'Không tìm thấy người dùng!' });
+        }
+        
+        res.status(200).json(user.songs);
+    } catch (err) {
+        console.error('Lỗi khi lấy bài hát của user:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// API lấy tất cả bài hát
+router.get('/', async (req, res) => {
+    try {
+        const songs = await Song.find();
+        res.status(200).json(songs);
+    } catch (err) {
+        console.error('Lỗi khi lấy danh sách bài hát:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
 
 module.exports = router;

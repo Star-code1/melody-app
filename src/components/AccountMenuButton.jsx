@@ -16,10 +16,11 @@ function AccountMenuButton({ onProfileClick }) {
     const [showProfileModal, setShowProfileModal] = useState(false);
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        navigate("/login");
-    };
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.reload();
+};
+
 
     return (
         <>
