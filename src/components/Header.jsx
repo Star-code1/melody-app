@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, UserCircle, User, LogOut, Settings, Heart, Clock, Download } from 'lucide-react';
 import AccountMenu from "../components/AccountMenuButton"; 
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Left from '../assets/Left.png';
+import Right from '../assets/Right.png';
 
 const Header = ({ isLoggedIn = false }) => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -100,12 +102,39 @@ const Header = ({ isLoggedIn = false }) => {
     <div style={customStyles.header} className="d-flex align-items-center justify-content-between">
       {/* Left side - Navigation arrows */}
       <div className="d-flex gap-2">
-        <button onClick={() => navigate(-1)} style={customStyles.navButton} className="btn rounded">
-          <ChevronLeft size={20} />
-        </button>
-        <button onClick={() => navigate(+1)} style={customStyles.navButton} className="btn rounded">
-          <ChevronRight size={20} />
-        </button>
+      <button 
+  onClick={() => navigate(-1)} 
+  style={{ 
+    backgroundImage: `url(${Left})`,
+    backgroundSize: "contain",  // Điều chỉnh ảnh theo kích thước nút
+    backgroundRepeat: "no-repeat", // Không lặp lại ảnh nền
+    backgroundPosition: "center", // Căn giữa ảnh trong nút
+    width: "40px", // Đặt kích thước nút tùy ý
+    height: "40px",
+    transform: "rotate(-45deg)"
+  }} 
+  className="btn rounded img-fluid me-3"
+>
+  <ChevronLeft size={20} />
+</button>
+
+<button 
+  onClick={() => navigate(+1)} 
+  style={{ 
+    backgroundImage: `url(${Right})`,
+    backgroundSize: "contain",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "center",
+    width: "40px",
+    height: "40px",
+    transform: "rotate(45deg)"
+  }} 
+  className="btn rounded img-fluid"
+>
+  <ChevronRight size={20} />
+</button>
+
+
       </div>
 
       {/* Middle section - could be a search bar or title */}

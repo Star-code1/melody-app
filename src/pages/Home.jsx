@@ -4,7 +4,7 @@ import '../stylecomponent/homestyle.css';
 import MusicCard from '../components/MusicCard';
 import axios from 'axios';
 import { FaPlay, FaMusic, FaSearch } from 'react-icons/fa';
-import bgImage from '../assets/hinh-nen-may-tinh-phi-hanh-gia-3.jpg';
+import bgImage from '../assets/hinh-nen-may-tinh-phi-hanh-gia-3.jpeg';
 const Home = () => {
   const [songs, setSongs] = useState([]);
   const [topSongs, setTopSongs] = useState([]);
@@ -65,9 +65,10 @@ const Home = () => {
 }
 
 .hero-section {
-  padding: 3rem;
+  padding: 6rem;
   margin: 1rem 0.1rem;
   margin-top: 0;
+  margin-right: 1rem;
 }
 .hero-section-title {
   background-color: rgba(0, 0, 0, 0.5);
