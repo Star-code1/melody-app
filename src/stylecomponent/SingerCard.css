@@ -1,0 +1,93 @@
+/* SingerCard.css */
+
+/* Container for each singer card */
+.singer-card {
+    width: 300px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin: 0 15px; /* Slightly more space between cards to match the image */
+    position: relative; /* For positioning the play button */
+    background-color: #181818; /* Dark background like Spotify */
+    border-radius: 10px; /* Rounded corners for the card */
+    padding: 15px; /* Add padding to give some space inside the card */
+    transition: background-color 0.3s ease; /* Smooth background transition on hover */
+}
+
+/* Circular image styling */
+.singer-image {
+    width: 200px; /* Matches the size in the image */
+    height: 200px;
+    border-radius: 50%; /* Circular image */
+    object-fit: cover; /* Ensures the image fits nicely */
+    transition: opacity 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/* Singer info (name and description) */
+.singer-info {
+    margin-top: 10px;
+}
+
+.singer-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff; 
+    margin: 0;
+}
+
+.singer-label {
+    font-size: 14px;
+    color: #b3b3b3; 
+    margin: 2px 0 0 0;
+}
+
+
+.singer-actions {
+    position: absolute;
+    top: 85%;
+    left: 85%;
+    transform: translate(-50%, -50%); 
+    opacity: 0; 
+    transition: opacity 0.3s ease; 
+}
+
+.play-button {
+    background-color: #1db954; /* Spotify green */
+    border: none;
+    border-radius: 50%; /* Circular button */
+    width: 50px; /* Slightly larger to match the image */
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #ffffff; /* White play icon */
+    font-size: 20px; /* Larger icon to match the image */
+    padding: 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Add a subtle shadow for depth */
+}
+
+/* Play button icon (using pseudo-element for the triangle) */
+.play-button::before {
+    content: '▶'; /* Unicode play symbol */
+    position: relative;
+    bottom: 0%;
+    display: block;
+}
+
+/* Show play button on hover */
+.singer-card:hover .singer-actions {
+    opacity: 1;
+}
+
+/* Dim the image slightly on hover */
+.singer-card:hover .singer-image {
+    opacity: 0.7; /* Slightly more dimming to match the effect */
+}
+
+/* Change background color on hover to match Spotify's effect */
+.singer-card:hover {
+    background-color: #282828; /* Lighter gray on hover */
+}
