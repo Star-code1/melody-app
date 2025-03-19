@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, Search, Disc, TrendingUp, Play, Clock, Ellipsis } from 'lucide-react';
+import { Heart, Search, Disc, Play, Clock, Ellipsis } from 'lucide-react';
 import 'bootstrap/dist/css/bootstrap.min.css'
 const SearchPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,19 +16,6 @@ const SearchPage = () => {
     { id: 8, title: "All Too Well", artist: "taylor swift", album: "Red", duration: "5:29", coverArt: "https://picsum.photos/200" },
     { id: 9, title: "Wildest Dreams", artist: "taylor swift", album: "1989", duration: "3:40", coverArt: "https://picsum.photos/200" },
     { id: 10, title: "Enchanted", artist: "taylor swift", album: "Speak Now", duration: "5:52", coverArt: "https://picsum.photos/200" },
-  ];
-
-  const topTrendingSongs = [
-    { id: 101, title: "Fortnight", artist: "Taylor Swift ft. Post Malone", plays: "10.5M", coverArt: "https://picsum.photos/id/237/200" },
-    { id: 102, title: "Texas Hold 'Em", artist: "Beyoncé", plays: "9.8M", coverArt: "https://picsum.photos/id/238/200" },
-    { id: 103, title: "Espresso", artist: "Sabrina Carpenter", plays: "8.7M", coverArt: "https://picsum.photos/id/239/200" },
-    { id: 104, title: "Houdini", artist: "Dua Lipa", plays: "7.9M", coverArt: "https://picsum.photos/id/240/200" },
-    { id: 105, title: "Paint The Town Red", artist: "Doja Cat", plays: "7.5M", coverArt: "https://picsum.photos/id/241/200" },
-    { id: 106, title: "Snooze", artist: "SZA", plays: "7.2M", coverArt: "https://picsum.photos/id/242/200" },
-    { id: 107, title: "Greedy", artist: "Tate McRae", plays: "6.8M", coverArt: "https://picsum.photos/id/243/200" },
-    { id: 108, title: "Lovin On Me", artist: "Jack Harlow", plays: "6.5M", coverArt: "https://picsum.photos/id/244/200" },
-    { id: 109, title: "Agora Hills", artist: "Doja Cat", plays: "6.2M", coverArt: "https://picsum.photos/id/245/200" },
-    { id: 110, title: "Not Like Us", artist: "Kendrick Lamar", plays: "5.9M", coverArt: "https://picsum.photos/id/246/200" },
   ];
 
   const toggleFavorite = (id) => {
@@ -63,17 +50,6 @@ const SearchPage = () => {
       border: '1px solid rgba(220, 53, 69, 0.5)',
       boxShadow: '0 4px 12px rgba(220, 53, 69, 0.2)'
     },
-    trendingItem: {
-      transition: 'all 0.3s ease',
-      border: '1px solid transparent',
-      backgroundColor: 'transparent'
-    },
-    trendingItemHover: {
-      transform: 'translateY(-2px)',
-      backgroundColor: 'rgba(33, 37, 41, 0.8)',
-      border: '1px solid rgba(220, 53, 69, 0.2)',
-      boxShadow: '0 4px 12px rgba(220, 53, 69, 0.1)'
-    },
     searchResult: {
       transition: 'all 0.3s ease',
       borderLeft: '4px solid transparent',
@@ -97,8 +73,8 @@ const SearchPage = () => {
     <div className="min-vh-100 bg-dark text-white p-4">
       <div className="container py-4">
         <div className="d-flex align-items-center mb-4">
-          <Disc size={36} className="text-danger me-3" />
-          <h1 className="display-5 fw-bold" style={customStyles.gradientText}>
+          <Disc size={28} className="text-danger me-2" />
+          <h1 className="display-6 fw-bold mb-0" style={customStyles.gradientText}>
             Search
           </h1>
         </div>
@@ -139,92 +115,6 @@ const SearchPage = () => {
           />
         </div>
 
-        <div className="mb-5">
-          <div className="d-flex align-items-center mb-3">
-            <TrendingUp size={24} className="text-danger me-2" />
-            <h2 className="fs-2 fw-bold mb-0">Top Trending</h2>
-          </div>
-          
-          <div className="row g-3">
-            {topTrendingSongs.map((song, index) => (
-              <div key={song.id} className="col-md-6">
-                <div className="d-flex align-items-center p-3 rounded-3 position-relative trending-item"
-                  style={customStyles.trendingItem}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.transform = customStyles.trendingItemHover.transform;
-                    e.currentTarget.style.backgroundColor = customStyles.trendingItemHover.backgroundColor;
-                    e.currentTarget.style.border = customStyles.trendingItemHover.border;
-                    e.currentTarget.style.boxShadow = customStyles.trendingItemHover.boxShadow;
-                    const overlay = e.currentTarget.querySelector('.cover-overlay');
-                    const playButton = e.currentTarget.querySelector('.play-button-mini');
-                    if (overlay) overlay.style.opacity = '1';
-                    if (playButton) playButton.style.transform = 'scale(1)';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.transform = 'none';
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                    e.currentTarget.style.border = '1px solid transparent';
-                    e.currentTarget.style.boxShadow = 'none';
-                    const overlay = e.currentTarget.querySelector('.cover-overlay');
-                    const playButton = e.currentTarget.querySelector('.play-button-mini');
-                    if (overlay) overlay.style.opacity = '0';
-                    if (playButton) playButton.style.transform = 'scale(0.9)';
-                  }}>
-                  <div className="me-3 fs-4 fw-bold text-secondary" style={{ width: '24px' }}>
-                    {index + 1}
-                  </div>
-                  <div className="position-relative me-3">
-                    <img 
-                      src={song.coverArt} 
-                      alt={song.title} 
-                      className="rounded-3" 
-                      style={{
-                        ...customStyles.coverArt,
-                        width: '56px',
-                        height: '56px',
-                        objectFit: 'cover',
-                        border: '1px solid #343a40'
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.transform = customStyles.coverArtHover.transform;
-                        e.currentTarget.style.boxShadow = customStyles.coverArtHover.boxShadow;
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.transform = 'scale(1)';
-                        e.currentTarget.style.boxShadow = 'none';
-                      }}
-                    />
-                    <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center rounded-3 cover-overlay"
-                      style={{ 
-                        opacity: 0, 
-                        transition: 'all 0.3s ease',
-                        cursor: 'pointer'
-                      }}>
-                      <div className="bg-danger rounded-circle d-flex align-items-center justify-content-center play-button-mini"
-                        style={{ 
-                          width: '28px', 
-                          height: '28px',
-                          transition: 'all 0.3s ease',
-                          transform: 'scale(0.9)',
-                          boxShadow: '0 4px 12px rgba(220, 38, 38, 0.2)'
-                        }}>
-                        <Play size={14} fill="white" style={{ marginLeft: '2px' }} />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex-grow-1">
-                    <h3 className="fs-6 fw-semibold text-white text-truncate mb-0">{song.title}</h3>
-                    <p className="small text-secondary text-truncate mb-0">{song.artist}</p>
-                  </div>
-                  <div className="ms-2 small text-secondary">
-                    {song.plays}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        
         <div className="mt-5">
           <h2 className="fs-2 fw-bold mb-4">Kết quả tìm kiếm</h2>
           <table className="table table-dark table-borderless">
@@ -370,12 +260,6 @@ const SearchPage = () => {
         .cover-overlay {
           opacity: 0;
           transition: all 0.3s ease;
-        }
-        .trending-item:hover .cover-overlay {
-          opacity: 1 !important;
-        }
-        .trending-item:hover .play-button-mini {
-          transform: scale(1) !important;
         }
       `}</style>
     </div>

@@ -70,8 +70,8 @@ const LikedSongsPage = () => {
         <div className="d-flex align-items-center justify-content-center rounded-3 shadow me-4" 
              style={{
                background: 'linear-gradient(135deg, #dc2626, #f87171)',
-               width: '160px',
-               height: '160px',
+               width: '120px',
+               height: '120px',
                transition: 'all 0.3s ease'
              }}
              onMouseOver={(e) => {
@@ -82,11 +82,11 @@ const LikedSongsPage = () => {
                e.currentTarget.style.transform = 'scale(1)';
                e.currentTarget.style.boxShadow = 'none';
              }}>
-          <Heart size={80} fill="white" color="white" />
+          <Heart size={60} fill="white" color="white" />
         </div>
         <div className="d-flex flex-column">
           <span className="text-uppercase small fw-semibold text-white-50">Playlist</span>
-          <h1 className="display-4 fw-bold mb-3 text-danger">Liked Songs</h1>
+          <h1 className="display-5 fw-bold mb-2 text-danger">Liked Songs</h1>
           <div className="d-flex align-items-center small">
             <span className="text-white-50">Những bài hát bạn yêu thích</span>
           </div>
