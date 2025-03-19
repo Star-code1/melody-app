@@ -15,13 +15,13 @@
   "dependencies": {
     "axios": "^1.8.3",
     "bootstrap": "^5.3.3",
+    "lucide-react": "^0.482.0",
     "Melody": "file:",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.9",
     "react-dom": "^18.2.0",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.3.0",
-    "lucide-react": "^0.482.0",
     "sass": "^1.86.0"
   },
   "devDependencies": {

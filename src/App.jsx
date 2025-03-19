@@ -16,10 +16,12 @@ function App() {
             <Sidebar />
           </Col>
           <Col  style={{padding: "0" }}>
+            <Header />
             <Page />
           </Col>
         </Row>
       </div>
+      <Player></Player>
     </BrowserRouter>
   );
 }
