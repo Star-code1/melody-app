@@ -25,5 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/users", userRoutes);
 app.use("/api/songs", songRoutes);
+// Serve static files from the uploads directory
+app.use('/uploads', express.static('uploads'));
 
 app.listen(PORT, () => console.log(`🚀 Server is running on port ${PORT}`));

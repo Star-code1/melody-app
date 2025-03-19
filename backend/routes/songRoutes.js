@@ -53,5 +53,14 @@ router.post('/upload', upload.fields([
     }
 });
 
+// GET all songs
+router.get('/', async (req, res) => {
+  try {
+    const songs = await Song.find();
+    res.status(200).json(songs);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 module.exports = router;

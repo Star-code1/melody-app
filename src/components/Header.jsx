@@ -44,6 +44,9 @@ const Header = ({ isLoggedIn = false }) => {
   const customStyles = {
     header: {
       padding: '16px',
+      background: '#181414',
+      borderRadius: '2rem',
+      margin: '0.5rem 1rem',
     },
     navButton: {
       backgroundColor: '#fff',
