@@ -27,7 +27,7 @@ function AccountMenuButton({ onProfileClick }) {
                 <Dropdown.Toggle
                     variant="dark"
                     className="rounded-circle p-2 d-flex align-items-center"
-                    style={{ background: "#1c1c1c", border: "none", width: "75px", height: "75px" }}
+                    style={{ background: "#1c1c1c", border: "none", width: "85px", height: "85px" }}
                 >
                     {avatar ? (
                         <img
@@ -40,12 +40,12 @@ function AccountMenuButton({ onProfileClick }) {
                         <span
                             className="text-white d-flex justify-content-center align-items-center"
                             style={{
-                                width: "50px",
-                                height: "50px",
+                                width: "60px",
+                                height: "60px",
                                 background: "#ff4081",
                                 borderRadius: "50%",
                                 fontWeight: "bold",
-                                fontSize: "1.2rem",
+                                fontSize: "2rem",
                             }}
                         >
                             {username.charAt(0).toUpperCase()}
@@ -53,7 +53,7 @@ function AccountMenuButton({ onProfileClick }) {
                     )}
                 </Dropdown.Toggle>
 
-                <Dropdown.Menu className="dropdown-menu-dark" style={{ fontSize: "1.5rem", padding: "10px" }}>
+                <Dropdown.Menu className="dropdown-menu-dark" style={{ fontSize: "2rem", padding: "10px" }}>
                     <Dropdown.Item onClick={() => setShowProfileModal(true)}>Tài khoản</Dropdown.Item>
                     <Dropdown.Item onClick={() => setShowPasswordModal(true)}>Đổi mật khẩu</Dropdown.Item>
                     <Dropdown.Divider />
