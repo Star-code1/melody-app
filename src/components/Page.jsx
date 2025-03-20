@@ -4,7 +4,6 @@ import LikedSongsPage from '../pages/LikedSongs'
 import SearchPage from '../pages/SearchPage'
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Container, Form, Button, Navbar, Nav } from "react-bootstrap";
 import Login from '../pages/Login';
 import Signup from '../pages/Signup';
 import PasswordReset from '../pages/PasswordReset';

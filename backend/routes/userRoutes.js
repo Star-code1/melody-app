@@ -1,8 +1,9 @@
-const express = require("express");
+import express from "express";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import User from "../models/User.js";
+
 const router = express.Router();
-const User = require("../models/User");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
 
 router.get("/", async (req, res) => {
     try {
@@ -157,5 +158,4 @@ router.post("/google-login", async (req, res) => {
     }
 });
 
-
-module.exports = router;
+export default router;

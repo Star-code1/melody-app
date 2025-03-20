@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const SongSchema = new mongoose.Schema({
     title: { type: String, required: true },
@@ -8,4 +8,4 @@ const SongSchema = new mongoose.Schema({
     imagePath: { type: String, required: true },
 }, { timestamps: true });
 
-module.exports = mongoose.model('Song', SongSchema);
+export default mongoose.model('Song', SongSchema);

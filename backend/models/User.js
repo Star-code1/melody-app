@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -18,6 +18,6 @@ const UserSchema = new mongoose.Schema({
 
     // Mảng chứa danh sách bài hát yêu thích của người dùng
     favoriteSongs: { type: mongoose.Schema.Types.Mixed, default: [] }, // Cho phép lưu bất kỳ dữ liệu gì
-});
+}, { timestamps: true });
 
-module.exports = mongoose.model("User", UserSchema);
+export default mongoose.model("User", UserSchema);

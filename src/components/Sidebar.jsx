@@ -8,13 +8,14 @@ import { FaList } from "react-icons/fa";
 import { FaMusic } from "react-icons/fa6";
 import { BsFillMusicPlayerFill, BsMusicNote } from "react-icons/bs";
 import { BiImage } from "react-icons/bi";
-import "./Sidebar.scss"; // Make sure to create this SCSS file
+import "./Sidebar.scss";
 
 function Sidebar() {
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
   
   const [songData, setSongData] = useState({
     title: "",
@@ -42,21 +43,49 @@ function Sidebar() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setUploadProgress(10);
     
-    const formData = new FormData();
-    formData.append("title", songData.title);
-    formData.append("description", songData.description);
-    formData.append("artist", songData.artist);
-    formData.append("audioFile", songData.audioFile);
-    formData.append("imageFile", songData.imageFile);
-
     try {
-      await axios.post("http://localhost:5000/api/songs/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      if (!songData.audioFile || !songData.imageFile) {
+        throw new Error("Vui lòng chọn cả file nhạc và ảnh bìa");
+      }
+      
+      // Create a FormData object for file upload
+      const formData = new FormData();
+      formData.append('title', songData.title);
+      formData.append('description', songData.description);
+      formData.append('artist', songData.artist);
+      formData.append('audioFile', songData.audioFile);
+      formData.append('imageFile', songData.imageFile);
+      
+      // Log thông tin để debug
+      console.log("File âm thanh:", songData.audioFile);
+      console.log("File hình ảnh:", songData.imageFile);
+      
+      setUploadProgress(30);
+      
+      // Upload directly to the server using multipart/form-data
+      const response = await axios.post(
+        "http://localhost:5000/api/songs/upload-with-files", 
+        formData, 
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            setUploadProgress(30 + (percentCompleted * 0.6)); // Scale between 30-90%
+          }
+        }
+      );
+      
+      setUploadProgress(100);
       setToastMessage("Bài hát đã được thêm thành công!");
       setShowToast(true);
       handleClose();
+      
       // Reset form
       setSongData({
         title: "",
@@ -67,10 +96,11 @@ function Sidebar() {
       });
     } catch (error) {
       console.error("Lỗi khi thêm bài hát", error);
-      setToastMessage("Có lỗi xảy ra khi thêm bài hát!");
+      setToastMessage(`Có lỗi xảy ra: ${error.response?.data?.error || error.message}`);
       setShowToast(true);
     } finally {
       setLoading(false);
+      setTimeout(() => setUploadProgress(0), 1000);
     }
   };
 
@@ -147,6 +177,11 @@ function Sidebar() {
                 required
                 className="form-file-input"
               />
+              {songData.audioFile && (
+                <div className="file-selected mt-2">
+                  <small>Đã chọn: {songData.audioFile.name}</small>
+                </div>
+              )}
             </Form.Group>
             
             <Form.Group className="mb-4">
@@ -159,9 +194,29 @@ function Sidebar() {
                 name="imageFile"
                 accept="image/*"
                 onChange={handleFileChange}
+                required
                 className="form-file-input"
               />
+              {songData.imageFile && (
+                <div className="file-selected mt-2">
+                  <small>Đã chọn: {songData.imageFile.name}</small>
+                </div>
+              )}
             </Form.Group>
+            
+            {loading && (
+              <div className="progress mb-3">
+                <div 
+                  className="progress-bar progress-bar-striped progress-bar-animated" 
+                  role="progressbar" 
+                  style={{ width: `${uploadProgress}%` }} 
+                  aria-valuenow={uploadProgress} 
+                  aria-valuemin="0" 
+                  aria-valuemax="100">
+                  {uploadProgress}%
+                </div>
+              </div>
+            )}
             
             <div className="modal-actions">
               <Button
@@ -180,7 +235,7 @@ function Sidebar() {
                 {loading ? (
                   <>
                     <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Đang xử lý...
+                    Đang tải lên...
                   </>
                 ) : (
                   "Thêm bài hát"

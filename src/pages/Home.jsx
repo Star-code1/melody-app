@@ -5,6 +5,8 @@ import MusicCard from '../components/MusicCard';
 import axios from 'axios';
 import { FaPlay, FaMusic, FaSearch } from 'react-icons/fa';
 import bgImage from '../assets/hinh-nen-may-tinh-phi-hanh-gia-3.jpeg';
+import './Home.scss';
+
 const Home = () => {
   const [songs, setSongs] = useState([]);
   const [topSongs, setTopSongs] = useState([]);
@@ -41,117 +43,6 @@ const Home = () => {
 
   return (
     <div className="melody-app">
-      {/* Custom scrollbar styles */}
-      <style jsx>{`
-        .melody-app {
-  height: 100vh;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #8e44ad #f5f5f5;
-}
-
-.melody-app::-webkit-scrollbar {
-  width: 0.5rem;
-}
-
-.melody-app::-webkit-scrollbar-track {
-  background: #f5f5f5;
-  border-radius: 0.625rem;
-}
-
-.melody-app::-webkit-scrollbar-thumb {
-  background-color: #8e44ad;
-  border-radius: 0.625rem;
-}
-
-.hero-section {
-  padding: 6rem;
-  margin: 1rem 0.1rem;
-  margin-top: 0;
-  margin-right: 1rem;
-}
-.hero-section-title {
-  background-color: rgba(0, 0, 0, 0.5);
-  padding: 5px 10px;
-  border-radius: 1rem;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
-  color: #FFFFFF;
-
-}
-
-.section-title {
-  font-weight: 700;
-  margin-bottom: 1.25rem;
-  color: #333;
-  position: relative;
-  padding-left: 0.9375rem;
-}
-
-.section-title::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 0.3125rem;
-  background: #8e44ad;
-  border-radius: 0.3125rem;
-}
-
-.songs-container {
-  padding: 1.25rem;
-  background: #fff;
-  border-radius: 0.9375rem;
-  box-shadow: 0 0.3125rem 0.9375rem rgba(0,0,0,0.05);
-  margin-bottom: 1.875rem;
-  margin-right: 1.25rem;
-  width: calc(100% - 1.25rem);
-}
-
-.play-button {
-  background: #8e44ad;
-  color: white;
-  border-radius: 3.125rem;
-  padding: 0.75rem 1.875rem;
-  font-weight: 600;
-  border: none;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-}
-
-.play-button:hover {
-  background: #9b59b6;
-  transform: scale(1.05);
-}
-
-.music-icon {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
-
-.music-card-title {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-.music-card-artist {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-      `}</style>
-
       {/* Hero Section */}
       <section className="hero-section" style={{ backgroundImage: `url(${bgImage})` }}>
         <div className="container">
