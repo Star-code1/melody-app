@@ -31,9 +31,8 @@ function GoogleLoginButton({ onSuccess }) {
             <img
                 src={google_icon}
                 alt="Google Logo"
-                width="20"
-                height="20"
                 className="me-2"
+                style={{width:"25px",height:"25px"}}
             />
             Đăng nhập bằng Google
         </Button>
