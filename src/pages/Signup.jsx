@@ -204,8 +204,8 @@ function Signup() {
   const validateStep = () => {
     let newErrors = {};
     if (step === 1) {
-      if (formData.password.length < 8 || !/[0-9!@#$%^&*]/.test(formData.password) || !/[A-Z]/.test(formData.password)) {
-        newErrors.password = "Mật khẩu phải có ít nhất 8 ký tự, 1 số/ký tự đặc biệt và 1 chữ cái in hoa.";
+      if (formData.password.length < 10 || !/[0-9!@#$%^&*]/.test(formData.password) || !/[A-Z]/.test(formData.password)) {
+        newErrors.password = "Mật khẩu phải có ít nhất 10 ký tự, 1 số/ký tự đặc biệt và 1 chữ cái in hoa.";
       }
     } else if (step === 2) {
       if (!formData.name.trim()) {
@@ -381,7 +381,7 @@ function Signup() {
                 </Form.Group>
                 {errors.password && <p className="text-danger small">{errors.password}</p>}
                 <ul className="small mt-2">
-                  <li>Ít nhất 8 ký tự</li>
+                  <li>Ít nhất 10 ký tự</li>
                   <li>1 chữ số hoặc ký tự đặc biệt (ví dụ: # ? ! &)</li>
                   <li>1 chữ cái in hoa</li>
                 </ul>
