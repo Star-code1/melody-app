@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Heart, Search, Disc, Play, Clock, Ellipsis } from 'lucide-react';
 import 'bootstrap/dist/css/bootstrap.min.css'
+import { useMusicPlayer } from "../contexts/MusicPlayerContext";
 import axios from 'axios';
 const SearchPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -9,6 +10,24 @@ const SearchPage = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [likedSongs, setLikedSongs] = useState([]);
 
+  const { playSong } = useMusicPlayer();
+    
+  const handlePlayClick = (item) => {
+    const song = {
+      id: item.id || Date.now().toString(),  // Dùng item.id thay vì id
+      title: item.title,
+      artist: item.artist,
+      coverUrl: item.imagePath,
+      audioUrl: item.audioPath,
+    };
+  
+    // Store current song in localStorage for persistence
+    localStorage.setItem("currentSong", JSON.stringify(song));
+  
+    // Play the song using context
+    playSong(song);
+  };
+  
   useEffect(() => {
     const fetchLikedSongs = async () => {
       const token = localStorage.getItem('token');
@@ -244,101 +263,102 @@ const SearchPage = () => {
                 
                 return (
                   <tr
-                    key={item._id}
-                    className="border-bottom border-secondary border-opacity-10"
-                    style={{
-                      ...customStyles.searchResult,
-                      transition: 'all 0.3s ease'
-                    }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.background = 'linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(220, 38, 38, 0.2))';
-                      e.currentTarget.style.borderLeft = '4px solid #dc2626';
-                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.15)';
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.background = '';
-                      e.currentTarget.style.borderLeft = '';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                  >
-                    <td className="ps-3 py-4 text-center position-relative">
-                      <span className="text-white-50 song-number">{index + 1}</span>
-                    </td>
-                    <td className="py-3">
-                      <div className="d-flex align-items-center">
-                        <div className="position-relative me-3">
-                          <div className={`position-absolute top-0 bottom-0 start-0 end-0 rounded-3 ${isFavorite ? 'shadow-danger' : ''}`}></div>
-                          <img 
-                            src={item.imagePath} 
-                            alt={item.title} 
-                            className="rounded-3 object-fit-cover border border-secondary" 
-                            style={{
-                              width: '64px',
-                              height: '64px',
-                              transition: 'all 0.3s ease'
-                            }}
-                            onMouseOver={(e) => {
-                              e.currentTarget.style.transform = 'scale(1.05)';
-                              e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
-                              e.currentTarget.style.border = '1px solid rgba(220, 38, 38, 0.5)';
-                            }}
-                            onMouseOut={(e) => {
-                              e.currentTarget.style.transform = 'scale(1)';
-                              e.currentTarget.style.boxShadow = 'none';
-                              e.currentTarget.style.border = '1px solid #343a40';
-                            }}
-                          />
-                          <div className="position-absolute top-0 bottom-0 start-0 end-0 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center rounded-3 cover-overlay"
-                               style={{opacity: 0, transition: 'all 0.3s ease'}}>
-                            <div className="bg-danger rounded-circle d-flex align-items-center justify-content-center play-button-mini"
-                                 style={{
-                                   width: '32px',
-                                   height: '32px',
-                                   transform: 'scale(0.9)',
-                                   transition: 'all 0.3s ease',
-                                   boxShadow: '0 4px 12px rgba(220, 38, 38, 0.2)'
-                                 }}>
-                              <Play size={16} fill="white" style={{marginLeft: '2px'}} />
-                            </div>
-                          </div>
-                        </div>
-                        <div>
-                          <div className="fs-5 fw-semibold text-white song-title mb-0" style={{transition: 'all 0.3s ease'}}>{item.title}</div>
-                          <div className="text-secondary">{item.artist}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3 text-end position-relative pe-5" style={{ width: '50px' }}>
-                      <button 
-                        className="btn btn-link p-2"
-                        style={{ 
-                          opacity: 0.75,
-                          transition: 'all 0.3s ease',
-                          transform: 'scale(1)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          marginLeft: 'auto'
-                        }}
-                        onMouseOver={(e) => {
-                          e.currentTarget.style.opacity = 1;
-                          e.currentTarget.style.transform = 'scale(1.1)';
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.opacity = 0.75;
-                          e.currentTarget.style.transform = 'scale(1)';
-                        }}
-                        onClick={() => {
-                          toggleFavorite(item._id);
-                        }}
-                      >
-                        <Heart 
-                          size={24} 
-                          fill={isFavorite ? "#dc3545" : "none"} 
-                          color={isFavorite ? "#dc3545" : "white"} 
-                          className={isFavorite ? "animate-pulse" : ""}
-                        />
-                      </button>
-                    </td>
+onClick={() => handlePlayClick(item)}  // Truyền item vào hàm handlePlayClick
+key={item._id}
+className="border-bottom border-secondary border-opacity-10"
+style={{
+...customStyles.searchResult,
+transition: 'all 0.3s ease'
+}}
+onMouseOver={(e) => {
+e.currentTarget.style.background = 'linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(220, 38, 38, 0.2))';
+e.currentTarget.style.borderLeft = '4px solid #dc2626';
+e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.15)';
+}}
+onMouseOut={(e) => {
+e.currentTarget.style.background = '';
+e.currentTarget.style.borderLeft = '';
+e.currentTarget.style.boxShadow = 'none';
+}}
+>
+<td className="ps-3 py-4 text-center position-relative">
+<span className="text-white-50 song-number">{index + 1}</span>
+</td>
+<td className="py-3">
+<div className="d-flex align-items-center">
+  <div className="position-relative me-3">
+    <div className={`position-absolute top-0 bottom-0 start-0 end-0 rounded-3 ${isFavorite ? 'shadow-danger' : ''}`}></div>
+    <img 
+      src={item.imagePath} 
+      alt={item.title} 
+      className="rounded-3 object-fit-cover border border-secondary" 
+      style={{
+        width: '64px',
+        height: '64px',
+        transition: 'all 0.3s ease'
+      }}
+      onMouseOver={(e) => {
+        e.currentTarget.style.transform = 'scale(1.05)';
+        e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.3)';
+        e.currentTarget.style.border = '1px solid rgba(220, 38, 38, 0.5)';
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.transform = 'scale(1)';
+        e.currentTarget.style.boxShadow = 'none';
+        e.currentTarget.style.border = '1px solid #343a40';
+      }}
+    />
+    <div className="position-absolute top-0 bottom-0 start-0 end-0 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center rounded-3 cover-overlay"
+          style={{opacity: 0, transition: 'all 0.3s ease'}}>
+      <div className="bg-danger rounded-circle d-flex align-items-center justify-content-center play-button-mini"
+            style={{
+              width: '32px',
+              height: '32px',
+              transform: 'scale(0.9)',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 4px 12px rgba(220, 38, 38, 0.2)'
+            }}>
+        <Play size={16} fill="white" style={{marginLeft: '2px'}} />
+      </div>
+    </div>
+  </div>
+  <div>
+    <div className="fs-5 fw-semibold text-white song-title mb-0" style={{transition: 'all 0.3s ease'}}>{item.title}</div>
+    <div className="text-secondary">{item.artist}</div>
+  </div>
+</div>
+</td>
+<td className="py-3 text-end position-relative pe-5" style={{ width: '50px' }}>
+<button 
+  className="btn btn-link p-2"
+  style={{ 
+    opacity: 0.75,
+    transition: 'all 0.3s ease',
+    transform: 'scale(1)',
+    display: 'flex',
+    alignItems: 'center',
+    marginLeft: 'auto'
+  }}
+  onMouseOver={(e) => {
+    e.currentTarget.style.opacity = 1;
+    e.currentTarget.style.transform = 'scale(1.1)';
+  }}
+  onMouseOut={(e) => {
+    e.currentTarget.style.opacity = 0.75;
+    e.currentTarget.style.transform = 'scale(1)';
+  }}
+  onClick={() => {
+    toggleFavorite(item._id);
+  }}
+>
+  <Heart 
+    size={24} 
+    fill={isFavorite ? "#dc3545" : "none"} 
+    color={isFavorite ? "#dc3545" : "white"} 
+    className={isFavorite ? "animate-pulse" : ""}
+  />
+</button>
+</td>
                   </tr>
                 );
               })}

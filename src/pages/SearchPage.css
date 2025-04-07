@@ -1,0 +1,85 @@
+.song-number {
+  transition: all 0.3s ease;
+}
+
+tr:hover .song-number {
+  opacity: 0;
+}
+
+tr:hover .song-title {
+  color: #f87171 !important;
+  text-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
+}
+
+tr:hover .cover-overlay {
+  opacity: 1 !important;
+}
+
+tr:hover .play-button-mini {
+  transform: scale(1) !important;
+  transition: all 0.3s ease;
+}
+
+.cover-overlay {
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+/* New styles for currently playing song */
+tr.playing .song-number {
+  opacity: 0;
+}
+
+tr.playing .song-title {
+  color: #ef4444 !important;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
+}
+
+tr.playing .play-button-mini {
+  transform: scale(1) !important;
+  color: #ef4444;
+}
+
+.play-indicator {
+  display: none;
+  animation: pulse 1.5s infinite;
+}
+
+tr.playing .play-indicator {
+  display: inline-block;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(220, 53, 69, 0.5);
+  border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(220, 53, 69, 0.7);
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(220, 53, 69, 0.5) rgba(0, 0, 0, 0.1);
+}
