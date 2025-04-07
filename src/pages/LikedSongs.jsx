@@ -1,13 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { Heart, Play, Clock, Music, MoreHorizontal, Ellipsis, UserPlus, Download, Trash2 } from 'lucide-react';
-import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { useMusicPlayer } from '../contexts/MusicPlayerContext';
 
 const LikedSongsPage = () => {
-  const [currentSong, setCurrentSong] = useState(null);
+  const [currentSongId, setCurrentSongId] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
   const [likedSongs, setLikedSongs] = useState([]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  
+  const { playSong, currentSong } = useMusicPlayer();
+
+  useEffect(() => {
+    if (currentSong && currentSong._id) {
+      setCurrentSongId(currentSong._id);
+    } else {
+      setCurrentSongId(null);
+    }
+  }, [currentSong]);
 
   const fetchLikedSongs = async () => {
     setIsLoading(true);
@@ -121,8 +132,15 @@ const LikedSongsPage = () => {
     }
   };
 
-  const handlePlay = (songId) => {
-    setCurrentSong(songId);
+  const handlePlay = (song) => {
+    setCurrentSongId(song._id);
+    playSong(song, likedSongs);
+  };
+
+  const playAllSongs = () => {
+    if (likedSongs.length > 0) {
+      handlePlay(likedSongs[0]);
+    }
   };
 
   const handleClickOutside = () => {
@@ -197,6 +215,7 @@ const LikedSongsPage = () => {
       <div className="px-4 py-3 d-flex align-items-center" style={customStyles.gradientNavbar}>
         <button className="btn rounded-circle d-flex align-items-center justify-content-center me-3" 
                 style={customStyles.playButton}
+                onClick={playAllSongs}
                 onMouseOver={(e) => {
                   e.currentTarget.style.backgroundColor = '#ef4444';
                   e.currentTarget.style.transform = 'scale(1.05)';
@@ -250,86 +269,97 @@ const LikedSongsPage = () => {
               </tr>
             </thead>
             <tbody>
-              {likedSongs.map((song, index) => (
-                <tr
-                  key={song._id}
-                  className={`border-bottom border-secondary border-opacity-10 ${currentSong === song._id ? 'active' : ''}`}
-                  style={{
-                    ...customStyles.hoverRow,
-                    ...(currentSong === song._id ? customStyles.currentSongHighlight : {})
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(220, 38, 38, 0.1))';
-                    e.currentTarget.style.borderLeft = '4px solid #dc2626';
-                  }}
-                  onMouseOut={(e) => {
-                    if (currentSong !== song._id) {
-                      e.currentTarget.style.background = '';
-                      e.currentTarget.style.borderLeft = '';
-                    }
-                  }}
-                  onDoubleClick={() => handlePlay(song._id)}
-                >
-                  <td className="ps-3 py-4 text-center position-relative">
-                    {currentSong === song._id ? (
-                      <Music size={20} className="text-danger" />
-                    ) : (
-                      <span className="text-white-50 song-number">{index + 1}</span>
-                    )}
-                  </td>
-                  <td className="py-3">
-                    <div className="d-flex align-items-center">
-                      <div className="position-relative">
-                        <div className={`position-absolute top-0 bottom-0 start-0 end-0 rounded-3 ${currentSong === song._id ? 'shadow-danger' : ''}`}></div>
-                        <img 
-                          src={song.imagePath} 
-                          alt={song.title} 
-                          className="rounded-3 object-fit-cover border border-secondary" 
-                          style={{
-                            width: '64px',
-                            height: '64px',
-                            transition: 'all 0.3s ease'
-                          }}
-                          onMouseOver={(e) => {
-                            e.currentTarget.style.transform = 'scale(1.05)';
-                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.2)';
-                          }}
-                          onMouseOut={(e) => {
-                            e.currentTarget.style.transform = 'scale(1)';
-                            e.currentTarget.style.boxShadow = 'none';
-                          }}
-                        />
-                        <div className="position-absolute top-0 bottom-0 start-0 end-0 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center rounded-3 cover-overlay"
-                             style={{opacity: 0, transition: 'all 0.3s ease'}}>
-                          <div className="bg-danger rounded-circle d-flex align-items-center justify-content-center play-button-mini"
-                               style={{
-                                 width: '32px',
-                                 height: '32px',
-                                 transform: 'scale(0.9)',
-                                 transition: 'all 0.3s ease'
-                               }}>
-                            <Play size={16} fill="white" style={{marginLeft: '2px'}} />
+              {likedSongs.map((song, index) => {
+                const isPlaying = currentSongId === song._id;
+                
+                return (
+                  <tr
+                    key={song._id}
+                    className={`border-bottom border-secondary border-opacity-10 ${isPlaying ? 'active-song' : ''}`}
+                    style={{
+                      ...customStyles.hoverRow,
+                      ...(isPlaying ? customStyles.currentSongHighlight : {})
+                    }}
+                    onMouseOver={(e) => {
+                      if (!isPlaying) {
+                        e.currentTarget.style.background = 'linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(220, 38, 38, 0.1))';
+                        e.currentTarget.style.borderLeft = '4px solid #dc2626';
+                      }
+                    }}
+                    onMouseOut={(e) => {
+                      if (!isPlaying) {
+                        e.currentTarget.style.background = '';
+                        e.currentTarget.style.borderLeft = '';
+                      }
+                    }}
+                    onClick={() => handlePlay(song)}
+                  >
+                    <td className="ps-3 py-4 text-center position-relative">
+                      {isPlaying ? (
+                        <Music size={20} className="text-danger" />
+                      ) : (
+                        <span className="text-white-50 song-number">{index + 1}</span>
+                      )}
+                    </td>
+                    <td className="py-3">
+                      <div className="d-flex align-items-center">
+                        <div className="position-relative" onClick={(e) => {
+                          e.stopPropagation();
+                          handlePlay(song);
+                        }}>
+                          <img 
+                            src={song.imagePath} 
+                            alt={song.title} 
+                            className="rounded-3 object-fit-cover border border-secondary" 
+                            style={{
+                              width: '64px',
+                              height: '64px',
+                              transition: 'all 0.3s ease'
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.transform = 'scale(1.05)';
+                              e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.2)';
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.transform = 'scale(1)';
+                              e.currentTarget.style.boxShadow = 'none';
+                            }}
+                          />
+                          <div className="position-absolute top-0 bottom-0 start-0 end-0 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center rounded-3 cover-overlay"
+                               style={{opacity: isPlaying ? 1 : 0, transition: 'all 0.3s ease'}}>
+                            <div className="bg-danger rounded-circle d-flex align-items-center justify-content-center play-button-mini"
+                                 style={{
+                                   width: '32px',
+                                   height: '32px',
+                                   transform: isPlaying ? 'scale(1)' : 'scale(0.9)',
+                                   transition: 'all 0.3s ease'
+                                 }}>
+                              <Play size={16} fill="white" style={{marginLeft: '2px'}} />
+                            </div>
                           </div>
                         </div>
+                        <div className="ms-3">
+                          <div className={`fs-5 fw-semibold ${isPlaying ? 'text-danger' : 'text-white song-title'}`}
+                               style={{transition: 'all 0.3s ease'}}>{song.title}</div>
+                          <div className="text-secondary">{song.artist}</div>
+                        </div>
                       </div>
-                      <div className="ms-3">
-                        <div className={`fs-5 fw-semibold ${currentSong === song._id ? 'text-danger' : 'text-white song-title'}`}
-                             style={{transition: 'all 0.3s ease'}}>{song.title}</div>
-                        <div className="text-secondary">{song.artist}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="text-end pe-4">
-                    <button 
-                      className="btn btn-link p-2 text-danger"
-                      title="Remove from liked songs"
-                      onClick={() => removeFromLiked(song._id)}
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="text-end pe-4">
+                      <button 
+                        className="btn btn-link p-2 text-danger"
+                        title="Remove from liked songs"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeFromLiked(song._id);
+                        }}
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
@@ -354,6 +384,12 @@ const LikedSongsPage = () => {
         tr:hover .play-button-mini {
           transform: scale(1) !important;
           transition: all 0.3s ease;
+        }
+        .active-song .song-title {
+          color: #f87171 !important;
+        }
+        .active-song .cover-overlay {
+          opacity: 1 !important;
         }
       `}</style>
     </div>

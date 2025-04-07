@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, Search, Disc, Play, Clock, Ellipsis } from 'lucide-react';
+import { Heart, Search, Disc, Play, Clock, Ellipsis, Music } from 'lucide-react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import { notifyFavoritesChanged } from '../utils/favoritesManager';
+import { useMusicPlayer } from '../contexts/MusicPlayerContext';
 
 const SearchPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -11,6 +12,22 @@ const SearchPage = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [likedSongs, setLikedSongs] = useState([]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [currentPlayingId, setCurrentPlayingId] = useState(null);
+  
+  const { playSong, currentSong } = useMusicPlayer();
+
+  useEffect(() => {
+    if (currentSong && currentSong._id) {
+      setCurrentPlayingId(currentSong._id);
+    } else {
+      setCurrentPlayingId(null);
+    }
+  }, [currentSong]);
+
+  const handlePlaySong = (song) => {
+    playSong(song, musicItems);
+    setCurrentPlayingId(song._id);
+  };
 
   useEffect(() => {
     const fetchLikedSongs = async () => {
@@ -253,33 +270,51 @@ const SearchPage = () => {
             <tbody>
               {musicItems.map((item, index) => {
                 const isFavorite = favorites.includes(item._id);
+                const isPlaying = currentPlayingId === item._id;
                 
                 return (
                   <tr
                     key={item._id}
-                    className="border-bottom border-secondary border-opacity-10"
+                    className={`border-bottom border-secondary border-opacity-10 ${isPlaying ? 'active-song' : ''}`}
                     style={{
                       ...customStyles.searchResult,
-                      transition: 'all 0.3s ease'
+                      transition: 'all 0.3s ease',
+                      ...(isPlaying ? {
+                        background: 'linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(220, 38, 38, 0.2))',
+                        borderLeft: '4px solid #dc2626',
+                      } : {})
                     }}
                     onMouseOver={(e) => {
-                      e.currentTarget.style.background = 'linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(220, 38, 38, 0.2))';
-                      e.currentTarget.style.borderLeft = '4px solid #dc2626';
-                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.15)';
+                      if (!isPlaying) {
+                        e.currentTarget.style.background = 'linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(220, 38, 38, 0.2))';
+                        e.currentTarget.style.borderLeft = '4px solid #dc2626';
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.15)';
+                      }
                     }}
                     onMouseOut={(e) => {
-                      e.currentTarget.style.background = '';
-                      e.currentTarget.style.borderLeft = '';
-                      e.currentTarget.style.boxShadow = 'none';
+                      if (!isPlaying) {
+                        e.currentTarget.style.background = '';
+                        e.currentTarget.style.borderLeft = '';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }
                     }}
+                    onClick={() => handlePlaySong(item)}
                   >
                     <td className="ps-3 py-4 text-center position-relative">
-                      <span className="text-white-50 song-number">{index + 1}</span>
+                      {isPlaying ? (
+                        <span className="text-danger song-number">
+                          <Music size={16} />
+                        </span>
+                      ) : (
+                        <span className="text-white-50 song-number">{index + 1}</span>
+                      )}
                     </td>
                     <td className="py-3">
                       <div className="d-flex align-items-center">
-                        <div className="position-relative me-3">
-                          <div className={`position-absolute top-0 bottom-0 start-0 end-0 rounded-3 ${isFavorite ? 'shadow-danger' : ''}`}></div>
+                        <div className="position-relative me-3" onClick={(e) => {
+                          e.stopPropagation();
+                          handlePlaySong(item);
+                        }}>
                           <img 
                             src={item.imagePath} 
                             alt={item.title} 
@@ -301,12 +336,12 @@ const SearchPage = () => {
                             }}
                           />
                           <div className="position-absolute top-0 bottom-0 start-0 end-0 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center rounded-3 cover-overlay"
-                               style={{opacity: 0, transition: 'all 0.3s ease'}}>
+                               style={{opacity: isPlaying ? 1 : 0, transition: 'all 0.3s ease'}}>
                             <div className="bg-danger rounded-circle d-flex align-items-center justify-content-center play-button-mini"
                                  style={{
                                    width: '32px',
                                    height: '32px',
-                                   transform: 'scale(0.9)',
+                                   transform: isPlaying ? 'scale(1)' : 'scale(0.9)',
                                    transition: 'all 0.3s ease',
                                    boxShadow: '0 4px 12px rgba(220, 38, 38, 0.2)'
                                  }}>
@@ -315,7 +350,8 @@ const SearchPage = () => {
                           </div>
                         </div>
                         <div>
-                          <div className="fs-5 fw-semibold text-white song-title mb-0" style={{transition: 'all 0.3s ease'}}>{item.title}</div>
+                          <div className={`fs-5 fw-semibold ${isPlaying ? 'text-danger' : 'text-white'} song-title mb-0`} 
+                               style={{transition: 'all 0.3s ease'}}>{item.title}</div>
                           <div className="text-secondary">{item.artist}</div>
                         </div>
                       </div>
@@ -331,15 +367,8 @@ const SearchPage = () => {
                           alignItems: 'center',
                           marginLeft: 'auto'
                         }}
-                        onMouseOver={(e) => {
-                          e.currentTarget.style.opacity = 1;
-                          e.currentTarget.style.transform = 'scale(1.1)';
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.opacity = 0.75;
-                          e.currentTarget.style.transform = 'scale(1)';
-                        }}
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           toggleFavorite(item._id);
                         }}
                       >
@@ -366,6 +395,10 @@ const SearchPage = () => {
         }
         tr:hover .song-number {
           opacity: 0;
+        }
+        tr.active-song .song-title {
+          color: #f87171 !important;
+          text-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
         }
         tr:hover .song-title {
           color: #f87171 !important;
