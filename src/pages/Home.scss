@@ -20,7 +20,8 @@
   }
   
   .hero-section {
-    background: url('../../public/Background.png');
+    background: url('../../public/Background.png') no-repeat ;
+    background-size: cover;
     padding: 6rem;
     margin: 1rem 0.1rem 0 1rem;
   

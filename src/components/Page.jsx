@@ -1,5 +1,4 @@
 import Home from "../pages/Home";
-import MySong from "../pages/MySong";
 import LikedSongsPage from '../pages/LikedSongs'
 import SearchPage from '../pages/SearchPage'
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
@@ -14,7 +13,6 @@ function Page() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/SearchPage" element={<SearchPage />} />
-        <Route path="/MySong" element={<MySong />} />
         <Route path="/LikedSongsPage" element={<LikedSongsPage />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/Signup" element={<Signup />} />

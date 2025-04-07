@@ -115,7 +115,6 @@ function Sidebar() {
       <div className="sidebar-section">
         <SidebarItem icon={<FaMusic />} text="Thêm bài hát" onClick={handleShow} />
         <SidebarItem to="/LikedSongsPage" icon={<FaHeart />} text="Nhạc yêu thích" />
-        <SidebarItem to="/MySong" icon={<FaList />} text="Nhạc của tôi" />
       </div>
 
       {/* Music Upload Modal */}
