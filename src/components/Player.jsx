@@ -12,7 +12,7 @@ import {
   Heart,
   X
 } from "lucide-react";
-import { useMusicPlayer } from "../contexts/MusicPlayerContext";
+import { useMusicPlayer } from "../contexts/MusicPlayerContext"; // Thay đổi import sử dụng file MusicPlayerContext
 import { notifyFavoritesChanged } from '../utils/favoritesManager';
 import "bootstrap/dist/css/bootstrap.min.css";
 

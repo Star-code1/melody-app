@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useState,
-  useRef,
-  useEffect,
-  useContext,
-} from "react";
+import React, { createContext, useState, useRef, useEffect, useContext } from 'react';
 
 // Create context
 const MusicPlayerContext = createContext();
@@ -23,25 +17,26 @@ export const MusicPlayerProvider = ({ children }) => {
   const [isRepeat, setIsRepeat] = useState(false);
   const [isShuffle, setIsShuffle] = useState(false);
   const [liked, setLiked] = useState(false);
-
+  
   const audioRef = useRef(null);
-
+  
   // Initialize audio element
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
     }
-
+    
+    // Set up event listeners
     const audio = audioRef.current;
-
+    
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
     };
-
+    
     const handleTimeUpdate = () => {
       setCurrentTime(audio.currentTime);
     };
-
+    
     const handleEnded = () => {
       console.log("Song ended, playlist state:", {
         currentIndex: currentSongIndex,
@@ -50,14 +45,12 @@ export const MusicPlayerProvider = ({ children }) => {
       });
 
       if (isRepeat) {
+        // Replay current song
         audio.currentTime = 0;
-        audio.play().catch((e) => console.error("Replay failed:", e));
+        audio.play().catch(e => console.error("Replay failed:", e));
       } else {
-        // Kiểm tra và tính toán nextIndex trước khi gọi playNextSong
-        const nextIndex =
-          currentSongIndex === playlist.length - 1 ? 0 : currentSongIndex + 1;
+        const nextIndex = currentSongIndex === playlist.length - 1 ? 0 : currentSongIndex + 1;
 
-        // Log để debug
         console.log("Calculating next song:", {
           nextIndex,
           nextSong: playlist[nextIndex]?.title,
@@ -72,38 +65,39 @@ export const MusicPlayerProvider = ({ children }) => {
         }
       }
     };
-
-    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-    audio.addEventListener("timeupdate", handleTimeUpdate);
-    audio.addEventListener("ended", handleEnded);
-
+    
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('ended', handleEnded);
+    
+    // Cleanup event listeners
     return () => {
-      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
-      audio.removeEventListener("timeupdate", handleTimeUpdate);
-      audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('ended', handleEnded);
     };
-  }, [isRepeat, playlist, currentSongIndex, currentSong]); // Thêm các dependencies cần thiết
-
+  }, [isRepeat, playlist, currentSongIndex, currentSong]);
+  
   // Update audio source when current song changes
   useEffect(() => {
     if (currentSong && audioRef.current) {
-      audioRef.current.src = currentSong.audioUrl;
+      audioRef.current.src = currentSong.audioUrl || currentSong.audioPath || currentSong.url;
       audioRef.current.load();
-
+      
       if (isPlaying) {
-        audioRef.current.play().catch((error) => {
+        audioRef.current.play().catch(error => {
           console.error("Autoplay prevented:", error);
           setIsPlaying(false);
         });
       }
     }
   }, [currentSong]);
-
+  
   // Handle play/pause state changes
   useEffect(() => {
     if (audioRef.current) {
       if (isPlaying) {
-        audioRef.current.play().catch((error) => {
+        audioRef.current.play().catch(error => {
           console.error("Play prevented:", error);
           setIsPlaying(false);
         });
@@ -112,24 +106,20 @@ export const MusicPlayerProvider = ({ children }) => {
       }
     }
   }, [isPlaying]);
-
+  
   // Handle volume and mute changes
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = isMuted ? 0 : volume / 100;
     }
   }, [volume, isMuted]);
-
+  
   // Play a specific song
-  const playSong = async (song) => {
+  const playSong = async (song, allSongs = []) => {
     try {
-      // Kiểm tra xem song có _id chưa
       if (!song._id && song.title) {
-        // Thử tìm bài hát theo title và artist
         const response = await fetch(
-          `http://localhost:5000/api/songs/search?query=${encodeURIComponent(
-            song.title
-          )}`
+          `http://localhost:5000/api/songs/search?query=${encodeURIComponent(song.title)}`
         );
         const data = await response.json();
         const matchingSong = data.find(
@@ -139,34 +129,43 @@ export const MusicPlayerProvider = ({ children }) => {
         );
 
         if (matchingSong) {
-          // Cập nhật _id từ bài hát đã tìm thấy
           song._id = matchingSong._id;
 
-          // Cập nhật các trường khác nếu cần
           if (!song.imagePath && matchingSong.imagePath) {
             song.imagePath = matchingSong.imagePath;
           }
         }
       }
 
-      // Tiếp tục logic playSong hiện tại
       setCurrentSong(song);
-      setIsPlaying(true);
-      setShowPlayer(true);
-
-      // Đảm bảo audioRef được cập nhật với URL mới
-      if (audioRef.current) {
-        audioRef.current.src = song.audioPath || song.url;
-        audioRef.current.load();
-        audioRef.current.play().catch((err) => {
-          console.error("Error playing audio:", err);
-        });
+      
+      if (allSongs && allSongs.length > 0) {
+        setPlaylist(allSongs);
+        const index = allSongs.findIndex(item => 
+          item.audioUrl === song.audioUrl || item.id === song.id || item._id === song._id
+        );
+        setCurrentSongIndex(index !== -1 ? index : 0);
+      } else {
+        if (song && !playlist.some(item => 
+          item.audioUrl === song.audioUrl || item.id === song.id || item._id === song._id)) {
+          setPlaylist(prev => [...prev, song]);
+          setCurrentSongIndex(playlist.length);
+        } else if (song) {
+          const index = playlist.findIndex(item => 
+            item.audioUrl === song.audioUrl || item.id === song.id || item._id === song._id
+          );
+          setCurrentSongIndex(index !== -1 ? index : 0);
+        }
       }
+      
+      setShowPlayer(true);
+      setIsPlaying(true);
+      setLiked(false);
     } catch (err) {
       console.error("Error playing song:", err);
     }
   };
-
+  
   // Close the player
   const closePlayer = () => {
     setIsPlaying(false);
@@ -175,12 +174,12 @@ export const MusicPlayerProvider = ({ children }) => {
       audioRef.current.pause();
     }
   };
-
+  
   // Toggle play/pause
   const togglePlay = () => {
     setIsPlaying(!isPlaying);
   };
-
+  
   // Play next song
   const playNextSong = () => {
     console.log("playNextSong called, playlist state:", {
@@ -193,21 +192,16 @@ export const MusicPlayerProvider = ({ children }) => {
       console.warn("Playlist is empty or has only one song");
       return;
     }
-
+    
     let nextIndex;
     if (isShuffle) {
-      // Play random song
       do {
         nextIndex = Math.floor(Math.random() * playlist.length);
       } while (nextIndex === currentSongIndex && playlist.length > 1);
     } else {
-      // Play next song in sequence
-      // Nếu là bài cuối cùng (currentSongIndex = playlist.length - 1)
-      // thì nextIndex sẽ là 0 (quay lại bài đầu tiên)
-      nextIndex =
-        currentSongIndex === playlist.length - 1 ? 0 : currentSongIndex + 1;
+      nextIndex = currentSongIndex === playlist.length - 1 ? 0 : currentSongIndex + 1;
     }
-
+    
     console.log("Playing next song:", {
       nextIndex,
       nextSong: playlist[nextIndex],
@@ -215,21 +209,20 @@ export const MusicPlayerProvider = ({ children }) => {
     setCurrentSongIndex(nextIndex);
     setCurrentSong(playlist[nextIndex]);
     setIsPlaying(true);
-    setLiked(false); // Reset liked state for new song
+    setLiked(false);
   };
-
+  
   // Play previous song
   const playPreviousSong = () => {
     if (playlist.length <= 1) return;
-
-    const prevIndex =
-      currentSongIndex === 0 ? playlist.length - 1 : currentSongIndex - 1;
+    
+    const prevIndex = currentSongIndex === 0 ? playlist.length - 1 : currentSongIndex - 1;
     setCurrentSongIndex(prevIndex);
     setCurrentSong(playlist[prevIndex]);
     setIsPlaying(true);
-    setLiked(false); // Reset liked state for new song
+    setLiked(false);
   };
-
+  
   // Handle progress change
   const handleProgressChange = (newTime) => {
     setCurrentTime(newTime);
@@ -237,7 +230,7 @@ export const MusicPlayerProvider = ({ children }) => {
       audioRef.current.currentTime = newTime;
     }
   };
-
+  
   // Handle volume change
   const handleVolumeChange = (newVolume) => {
     setVolume(newVolume);
@@ -245,35 +238,35 @@ export const MusicPlayerProvider = ({ children }) => {
       setIsMuted(false);
     }
   };
-
+  
   // Toggle mute
   const toggleMute = () => {
     setIsMuted(!isMuted);
   };
-
+  
   // Toggle like
   const toggleLike = () => {
     setLiked(!liked);
   };
-
+  
   // Toggle repeat
   const toggleRepeat = () => {
     setIsRepeat(!isRepeat);
   };
-
+  
   // Toggle shuffle
   const toggleShuffle = () => {
     setIsShuffle(!isShuffle);
   };
-
+  
   // Format time helper
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
-
-  // Thêm useEffect để theo dõi thay đổi của playlist
+  
+  // Debug useEffects
   useEffect(() => {
     console.log("Playlist updated:", {
       total: playlist.length,
@@ -286,18 +279,6 @@ export const MusicPlayerProvider = ({ children }) => {
   }, [playlist]);
 
   useEffect(() => {
-    console.log("Playlist state changed:", {
-      length: playlist.length,
-      songs: playlist.map((song) => ({
-        id: song.id,
-        title: song.title,
-        artist: song.artist,
-      })),
-    });
-  }, [playlist]);
-
-  // Thêm useEffect để debug playlist và currentSongIndex
-  useEffect(() => {
     console.log("Playlist/Index state changed:", {
       currentIndex: currentSongIndex,
       playlistLength: playlist.length,
@@ -305,11 +286,10 @@ export const MusicPlayerProvider = ({ children }) => {
       nextSong: playlist[currentSongIndex + 1]?.title,
     });
   }, [playlist, currentSongIndex, currentSong]);
-
+  
   return (
-    <MusicPlayerContext.Provider
-      value={{
-        // Player state
+    <MusicPlayerContext.Provider 
+      value={{ 
         showPlayer,
         isPlaying,
         currentSong,
@@ -319,11 +299,9 @@ export const MusicPlayerProvider = ({ children }) => {
         currentTime,
         volume,
         isMuted,
-        isRepeat,
+        isRepeat, 
         isShuffle,
         liked,
-
-        // Player actions
         playSong,
         closePlayer,
         togglePlay,
@@ -335,7 +313,7 @@ export const MusicPlayerProvider = ({ children }) => {
         toggleLike,
         toggleRepeat,
         toggleShuffle,
-        formatTime,
+        formatTime
       }}
     >
       {children}
