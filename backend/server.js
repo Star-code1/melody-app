@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-import { v2 as cloudinary } from "cloudinary"; // Sửa thành v2 API
+import { v2 as cloudinary } from "cloudinary";
 
 import userRoutes from "./routes/userRoutes.js";
 import songRoutes from "./routes/songRoutes.js";
@@ -27,26 +27,64 @@ const MONGO_URI = process.env.MONGO_URI;
 
 mongoose.set("strictQuery", false);
 
-mongoose.connect(MONGO_URI)
+mongoose
+  .connect(MONGO_URI)
   .then(() => console.log("✅ MongoDB Atlas connected"))
   .catch((err) => console.error("❌ MongoDB Atlas connection error:", err));
 
-app.use(cors());
+// Enable CORS for all routes and origins
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Đăng ký router
+// API routes
 app.use("/api/users", userRoutes);
 app.use("/api/songs", songRoutes);
 
-// Phục vụ tệp tĩnh từ thư mục public (hình ảnh và audio)
-app.use("/public", express.static(path.join(__dirname, "public")));
+// Serve static assets in production
+// Determine if we're in production
+const isProduction = process.env.NODE_ENV === "production";
 
-// Root route
-app.get("/", (req, res) => {
-  res.send("🎵 Music App API is running...");
+if (isProduction) {
+  // Serve static files from the frontend build directory
+  const frontendPath = path.resolve(__dirname, "../dist");
+  app.use(express.static(frontendPath));
+
+  // Handle static image files
+  app.use("/BackGround.png", (req, res) => {
+    res.sendFile(path.resolve(frontendPath, "BackGround.png"));
+  });
+
+  // For any other request, send to index.html (client-side routing)
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(frontendPath, "index.html"));
+  });
+} else {
+  // Development mode
+  // Phục vụ tệp tĩnh từ thư mục public (hình ảnh và audio)
+  app.use("/public", express.static(path.join(__dirname, "public")));
+
+  // Root route for API testing
+  app.get("/", (req, res) => {
+    res.send("🎵 Music App API is running...");
+  });
+}
+
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  console.error("Server error:", err);
+  res.status(500).json({
+    error: true,
+    message: isProduction ? "Internal Server Error" : err.message,
+  });
 });
 
-app.listen(PORT, () =>
-  console.log(`🚀 Server is running on http://localhost:${PORT}`)
-);
+// Start the server
+app.listen(PORT, () => console.log(`🚀 Server is running on port ${PORT}`));
