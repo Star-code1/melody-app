@@ -107,4 +107,33 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/", async (req, res) => {
+  try {
+    const songs = await Song.find().sort({ createdAt: -1 });
+    res.status(200).json(songs);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/search", async (req, res) => {
+  try {
+    const { query } = req.query;
+    
+    if (!query) {
+      return res.status(400).json({ error: "Cần cung cấp từ khóa tìm kiếm" });
+    }
+    const songs = await Song.find({
+      $or: [
+        { title: { $regex: query, $options: "i" } },   
+        { artist: { $regex: query, $options: "i" } }   
+      ]
+    }).sort({ createdAt: -1 });
+    res.status(200).json(songs);
+  } catch (err) {
+    console.error("Search error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;
