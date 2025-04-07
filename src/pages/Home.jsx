@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { MusicPlayerProvider } from '../contexts/MusicPlayerContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../stylecomponent/homestyle.css';
 import MusicCard from '../components/MusicCard';
-import Player from '../components/Player';
 import axios from 'axios';
 import { FaPlay, FaMusic } from 'react-icons/fa';
 import './Home.scss';
+import { useMusicPlayer } from '../contexts/MusicPlayerContext';
 
-// Home content component
-const HomeContent = () => {
+// Home now without MusicPlayerProvider wrapper
+const Home = () => {
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { playSong } = useMusicPlayer(); // Access context directly
 
   useEffect(() => {
     // Fetch songs from API
@@ -36,7 +36,7 @@ const HomeContent = () => {
       try {
         const parsedSong = JSON.parse(savedSong);
         // We could auto-play the last song here if desired
-        // by using the playSong function from context
+        // playSong(parsedSong);
       } catch (err) {
         console.error('Error parsing saved song:', err);
       }
@@ -108,8 +108,7 @@ const HomeContent = () => {
         </div>
       </div>
 
-      {/* Player component is now automatically managed by the context */}
-      <Player />
+      {/* Player is now in the App component, not here */}
 
       {/* Footer */}
       <footer className="bg-dark text-white text-center py-4 mt-5">
@@ -118,15 +117,6 @@ const HomeContent = () => {
         </div>
       </footer>
     </div>
-  );
-};
-
-// Main component wrapped in context provider
-const Home = () => {
-  return (
-    <MusicPlayerProvider>
-      <HomeContent />
-    </MusicPlayerProvider>
   );
 };
 
