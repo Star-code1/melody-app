@@ -184,7 +184,7 @@ const LikedSongsPage = () => {
                 <td className="py-3">
                   <div className="d-flex align-items-center">
                     <div className="position-relative">
-                      <div className={`position-absolute top-0 bottom-0 start-0 end-0 rounded-3 ${currentSong === song.id ? 'shadow-danger' : ''}`}></div>
+                      <div className={`position-absolute top-0 bottom-0 start-0 end-0 rounded-3 ${currentSong === song._id ? 'shadow-danger' : ''}`}></div>
                       <img 
                         src={song.imagePath} 
                         alt={song.title} 
@@ -217,7 +217,7 @@ const LikedSongsPage = () => {
                       </div>
                     </div>
                     <div className="ms-3">
-                      <div className={`fs-5 fw-semibold ${currentSong === song.id ? 'text-danger' : 'text-white song-title'}`}
+                      <div className={`fs-5 fw-semibold ${currentSong === song._id ? 'text-danger' : 'text-white song-title'}`}
                            style={{transition: 'all 0.3s ease'}}>{song.title}</div>
                       <div className="text-secondary">{song.artist}</div>
                     </div>
@@ -227,10 +227,10 @@ const LikedSongsPage = () => {
                 <td className="py-3 text-end text-secondary fs-6 pe-4">{song.duration}</td>
                 <td className="py-3 text-end position-relative pe-4" onClick={(e) => {
                   e.stopPropagation();
-                  setActiveMenu(activeMenu === song.id ? null : song.id);
+                  setActiveMenu(activeMenu === song._id ? null : song._id);
                 }}>
                   <Ellipsis size={24} className="song-more-icon" style={{opacity: 0, transition: 'all 0.3s ease'}} />
-                  {activeMenu === song.id && (
+                  {activeMenu === song._id && (
                     <div className="position-absolute end-0 top-10 bg-dark rounded-3 shadow-lg py-2 mt-2 dropdown-menu show" 
                          style={{
                            width: '200px',
