@@ -111,20 +111,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET route for single song by ID
-router.get("/:id", async (req, res) => {
-  try {
-    const song = await Song.findById(req.params.id);
-    if (!song) {
-      return res.status(404).json({ error: "Song not found" });
-    }
-    res.status(200).json(song);
-  } catch (err) {
-    console.error("Error fetching song:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
+// Search route should come before the /:id route
 router.get("/search", async (req, res) => {
   try {
     const { query } = req.query;
@@ -162,6 +149,20 @@ router.get("/liked", async (req, res) => {
   } catch (err) {
     console.error("Error getting liked songs:", err);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// GET route for single song by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const song = await Song.findById(req.params.id);
+    if (!song) {
+      return res.status(404).json({ error: "Song not found" });
+    }
+    res.status(200).json(song);
+  } catch (err) {
+    console.error("Error fetching song:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 
