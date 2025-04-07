@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Heart, Play, Clock, Music, MoreHorizontal, Ellipsis, UserPlus, Download, Trash2 } from 'lucide-react';
 import 'bootstrap/dist/css/bootstrap.min.css'
 
@@ -6,39 +6,120 @@ const LikedSongsPage = () => {
   const [currentSong, setCurrentSong] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
   const [likedSongs, setLikedSongs] = useState([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchLikedSongs = async () => {
+    setIsLoading(true);
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Please log in to view your liked songs.');
+      setIsLoading(false);
+      return;
+    }
+    
+    let userId;
+    try {
+      userId = JSON.parse(token)._id;
+    } catch (err) {
+      console.error('Error parsing token:', err);
+      alert('Invalid token format.');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/songs/liked?userId=${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Server responded with status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Fetched liked songs:', data);
+      setLikedSongs(data);
+      
+      localStorage.setItem('likedSongsLastFetch', new Date().getTime().toString());
+    } catch (err) {
+      console.error('Error fetching liked songs:', err);
+      alert('Failed to load liked songs. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchLikedSongs = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Please log in to view your liked songs.');
-        return;
-      }
-      let userId;
-      try {
-        userId = JSON.parse(token)._id;
-      } catch (err) {
-        console.error('Error parsing token:', err);
-        alert('Invalid token format.');
-        return;
-      }
-  
-      try {
-        const response = await fetch(`http://localhost:5000/api/songs/liked?userId=${userId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        const data = await response.json();
-        setLikedSongs(data);
-      } catch (err) {
-        console.error('Error fetching liked songs:', err);
-        alert('Failed to load liked songs. Please try again.');
+    fetchLikedSongs();
+    
+    const handleStorageChange = (e) => {
+      if (e.key === 'favoritesUpdated') {
+        console.log('Favorites updated in another page, refreshing...');
+        fetchLikedSongs();
       }
     };
-  
-    fetchLikedSongs();
-  }, []);
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    const intervalId = setInterval(() => {
+      const lastFetch = localStorage.getItem('likedSongsLastFetch');
+      const now = new Date().getTime();
+      
+      if (!lastFetch || now - parseInt(lastFetch) > 30000) {
+        console.log('Auto-refreshing liked songs...');
+        fetchLikedSongs();
+      }
+    }, 30000);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(intervalId);
+    };
+  }, [refreshTrigger]);
+
+  const handleRefresh = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
+
+  const removeFromLiked = async (songId) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    
+    let userId;
+    try {
+      userId = JSON.parse(token)._id;
+    } catch (err) {
+      console.error('Error parsing token:', err);
+      return;
+    }
+    
+    try {
+      setLikedSongs(prev => prev.filter(song => song._id !== songId));
+      
+      const response = await fetch('http://localhost:5000/api/songs/liked', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ songId, userId })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to remove song from favorites');
+      }
+      
+      localStorage.setItem('favoritesUpdated', new Date().getTime().toString());
+      
+      console.log('Song removed from favorites');
+    } catch (err) {
+      console.error('Error removing song from favorites:', err);
+      fetchLikedSongs();
+    }
+  };
 
   const handlePlay = (songId) => {
     setCurrentSong(songId);
@@ -113,7 +194,6 @@ const LikedSongsPage = () => {
         </div>
       </div>
 
-
       <div className="px-4 py-3 d-flex align-items-center" style={customStyles.gradientNavbar}>
         <button className="btn rounded-circle d-flex align-items-center justify-content-center me-3" 
                 style={customStyles.playButton}
@@ -135,98 +215,124 @@ const LikedSongsPage = () => {
                 onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}>
           <Heart size={32} fill="#dc2626" />
         </button>
-        <button className="btn text-white-50" 
-                style={{opacity: 0.7, transition: 'all 0.3s ease'}}
-                onMouseOver={(e) => e.currentTarget.style.opacity = 1}
-                onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}>
+        <button 
+          className="btn text-white-50" 
+          style={{opacity: 0.7, transition: 'all 0.3s ease'}}
+          onClick={handleRefresh}
+          onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+          onMouseOut={(e) => e.currentTarget.style.opacity = 0.7}
+          title="Refresh liked songs"
+        >
           <MoreHorizontal size={24} />
         </button>
       </div>
 
       <div className="flex-grow-1 px-4 overflow-auto" style={customStyles.gradientBackground}>
-        <table className="table table-dark table-borderless " style={{marginBottom: '10rem'}}>
-          <thead>
-            <tr className="border-bottom border-secondary border-opacity-25 text-white-50">
-              <th className="ps-3 fw-bold fs-5 text-center">#</th>
-              <th className="fw-bold fs-5 text-start">Tiêu đề</th>
-
-            </tr>
-          </thead>
-          <tbody>
-            {likedSongs.map((song, index) => (
-              <tr
-                key={song._id}
-                className={`border-bottom border-secondary border-opacity-10 ${currentSong === song.id ? 'active' : ''}`}
-                style={{
-                  ...customStyles.hoverRow,
-                  ...(currentSong === song._id ? customStyles.currentSongHighlight : {})
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.background = 'linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(220, 38, 38, 0.1))';
-                  e.currentTarget.style.borderLeft = '4px solid #dc2626';
-                }}
-                onMouseOut={(e) => {
-                  if (currentSong !== song._id) {
-                    e.currentTarget.style.background = '';
-                    e.currentTarget.style.borderLeft = '';
-                  }
-                }}
-                onDoubleClick={() => handlePlay(song._id)}
-              >
-                <td className="ps-3 py-4 text-center position-relative">
-                  {currentSong === song._id ? (
-                    <Music size={20} className="text-danger" />
-                  ) : (
-                    <span className="text-white-50 song-number">{index + 1}</span>
-                  )}
-                  
-                </td>
-                <td className="py-3">
-                  <div className="d-flex align-items-center">
-                    <div className="position-relative">
-                      <div className={`position-absolute top-0 bottom-0 start-0 end-0 rounded-3 ${currentSong === song._id ? 'shadow-danger' : ''}`}></div>
-                      <img 
-                        src={song.imagePath} 
-                        alt={song.title} 
-                        className="rounded-3 object-fit-cover border border-secondary" 
-                        style={{
-                          width: '64px',
-                          height: '64px',
-                          transition: 'all 0.3s ease'
-                        }}
-                        onMouseOver={(e) => {
-                          e.currentTarget.style.transform = 'scale(1.05)';
-                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.2)';
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.transform = 'scale(1)';
-                          e.currentTarget.style.boxShadow = 'none';
-                        }}
-                      />
-                      <div className="position-absolute top-0 bottom-0 start-0 end-0 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center rounded-3 cover-overlay"
-                           style={{opacity: 0, transition: 'all 0.3s ease'}}>
-                        <div className="bg-danger rounded-circle d-flex align-items-center justify-content-center play-button-mini"
-                             style={{
-                               width: '32px',
-                               height: '32px',
-                               transform: 'scale(0.9)',
-                               transition: 'all 0.3s ease'
-                             }}>
-                          <Play size={16} fill="white" style={{marginLeft: '2px'}} />
+        {isLoading ? (
+          <div className="d-flex justify-content-center my-5">
+            <div className="spinner-border text-danger" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        ) : likedSongs.length === 0 ? (
+          <div className="text-center my-5 py-5">
+            <Heart size={48} className="text-danger mb-3" />
+            <h4 className="text-white-50">Your liked songs will appear here</h4>
+            <p className="text-secondary">Go discover some music you love</p>
+          </div>
+        ) : (
+          <table className="table table-dark table-borderless " style={{marginBottom: '10rem'}}>
+            <thead>
+              <tr className="border-bottom border-secondary border-opacity-25 text-white-50">
+                <th className="ps-3 fw-bold fs-5 text-center">#</th>
+                <th className="fw-bold fs-5 text-start">Tiêu đề</th>
+                <th className="text-end pe-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {likedSongs.map((song, index) => (
+                <tr
+                  key={song._id}
+                  className={`border-bottom border-secondary border-opacity-10 ${currentSong === song._id ? 'active' : ''}`}
+                  style={{
+                    ...customStyles.hoverRow,
+                    ...(currentSong === song._id ? customStyles.currentSongHighlight : {})
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(220, 38, 38, 0.1))';
+                    e.currentTarget.style.borderLeft = '4px solid #dc2626';
+                  }}
+                  onMouseOut={(e) => {
+                    if (currentSong !== song._id) {
+                      e.currentTarget.style.background = '';
+                      e.currentTarget.style.borderLeft = '';
+                    }
+                  }}
+                  onDoubleClick={() => handlePlay(song._id)}
+                >
+                  <td className="ps-3 py-4 text-center position-relative">
+                    {currentSong === song._id ? (
+                      <Music size={20} className="text-danger" />
+                    ) : (
+                      <span className="text-white-50 song-number">{index + 1}</span>
+                    )}
+                  </td>
+                  <td className="py-3">
+                    <div className="d-flex align-items-center">
+                      <div className="position-relative">
+                        <div className={`position-absolute top-0 bottom-0 start-0 end-0 rounded-3 ${currentSong === song._id ? 'shadow-danger' : ''}`}></div>
+                        <img 
+                          src={song.imagePath} 
+                          alt={song.title} 
+                          className="rounded-3 object-fit-cover border border-secondary" 
+                          style={{
+                            width: '64px',
+                            height: '64px',
+                            transition: 'all 0.3s ease'
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.05)';
+                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(220, 38, 38, 0.2)';
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                        />
+                        <div className="position-absolute top-0 bottom-0 start-0 end-0 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center rounded-3 cover-overlay"
+                             style={{opacity: 0, transition: 'all 0.3s ease'}}>
+                          <div className="bg-danger rounded-circle d-flex align-items-center justify-content-center play-button-mini"
+                               style={{
+                                 width: '32px',
+                                 height: '32px',
+                                 transform: 'scale(0.9)',
+                                 transition: 'all 0.3s ease'
+                               }}>
+                            <Play size={16} fill="white" style={{marginLeft: '2px'}} />
+                          </div>
                         </div>
                       </div>
+                      <div className="ms-3">
+                        <div className={`fs-5 fw-semibold ${currentSong === song._id ? 'text-danger' : 'text-white song-title'}`}
+                             style={{transition: 'all 0.3s ease'}}>{song.title}</div>
+                        <div className="text-secondary">{song.artist}</div>
+                      </div>
                     </div>
-                    <div className="ms-3">
-                      <div className={`fs-5 fw-semibold ${currentSong === song._id ? 'text-danger' : 'text-white song-title'}`}
-                           style={{transition: 'all 0.3s ease'}}>{song.title}</div>
-                      <div className="text-secondary">{song.artist}</div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  </td>
+                  <td className="text-end pe-4">
+                    <button 
+                      className="btn btn-link p-2 text-danger"
+                      title="Remove from liked songs"
+                      onClick={() => removeFromLiked(song._id)}
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       <style jsx>{`

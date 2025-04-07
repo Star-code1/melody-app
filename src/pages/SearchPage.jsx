@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Heart, Search, Disc, Play, Clock, Ellipsis } from 'lucide-react';
-import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
+import { notifyFavoritesChanged } from '../utils/favoritesManager';
+
 const SearchPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [favorites, setFavorites] = useState([]);  // Change this to an empty array
+  const [favorites, setFavorites] = useState([]);
   const [musicItems, setMusicItems] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [likedSongs, setLikedSongs] = useState([]);
-  const [refreshTrigger, setRefreshTrigger] = useState(0); // Add refresh trigger state
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     const fetchLikedSongs = async () => {
@@ -33,18 +35,17 @@ const SearchPage = () => {
         
         const data = await response.json();
         console.log("Fetched liked songs:", data);
-        // Extract song IDs from liked songs
         const likedSongIds = data.map(song => song._id);
         console.log("Liked song IDs:", likedSongIds);
         setLikedSongs(likedSongIds);
-        setFavorites(likedSongIds); // Update favorites state with liked songs
+        setFavorites(likedSongIds);
       } catch (err) {
         console.error('Error fetching liked songs:', err);
       }
     };
   
     fetchLikedSongs();
-  }, [refreshTrigger]); // Use refresh trigger instead of likedSongs.length to prevent infinite loops
+  }, [refreshTrigger]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -61,7 +62,7 @@ const SearchPage = () => {
         };
         fetchAllSongs();
       }
-    }, 500); // Added a small delay for better UX
+    }, 500);
   
     return () => clearTimeout(timer);
   }, [searchTerm]);
@@ -82,11 +83,8 @@ const SearchPage = () => {
     }
     
     if (favorites.includes(id)) {
-      // Remove from favorites locally first (optimistic UI update)
       setFavorites(favorites.filter(favId => favId !== id));
-      
       try {
-        // Send DELETE request to remove from liked songs
         const response = await fetch('http://localhost:5000/api/songs/liked', {
           method: 'DELETE',
           headers: {
@@ -102,20 +100,15 @@ const SearchPage = () => {
         const data = await response.json();
         console.log(data.message);
         
-        // Refresh the liked songs list
-        setRefreshTrigger(prev => prev + 1);
+        setLikedSongs(likedSongs.filter(songId => songId !== id));
+        notifyFavoritesChanged();
       } catch (err) {
         console.error('Error removing liked song:', err);
-        // Revert UI state if API call fails
-        setFavorites(prev => [...prev, id]);
-        alert('Failed to remove from favorites. Please try again.');
+        setFavorites([...favorites]);
       }
     } else {
-      // Add to favorites locally first (optimistic UI update)
-      setFavorites(prev => [...prev, id]);
-      
+      setFavorites([...favorites, id]);
       try {
-        // Send POST request to add to liked songs
         const response = await fetch('http://localhost:5000/api/songs/liked', {
           method: 'POST',
           headers: {
@@ -131,13 +124,11 @@ const SearchPage = () => {
         const data = await response.json();
         console.log(data.message);
         
-        // Refresh the liked songs list
-        setRefreshTrigger(prev => prev + 1);
+        setLikedSongs([...likedSongs, id]);
+        notifyFavoritesChanged();
       } catch (err) {
         console.error('Error adding liked song:', err);
-        // Revert UI state if API call fails
-        setFavorites(prev => prev.filter(favId => favId !== id));
-        alert('Failed to add to favorites. Please try again.');
+        setFavorites(favorites.filter(favId => favId !== id));
       }
     }
   };

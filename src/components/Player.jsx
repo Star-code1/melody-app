@@ -13,6 +13,7 @@ import {
   X
 } from "lucide-react";
 import { useMusicPlayer } from "../contexts/MusicPlayerContext";
+import { notifyFavoritesChanged } from '../utils/favoritesManager';
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const Player = () => {
@@ -122,6 +123,9 @@ const Player = () => {
           },
           body: JSON.stringify({ songId: currentSong._id, userId })
         });
+        
+        // Notify other components about the change
+        notifyFavoritesChanged();
       } else {
         // Add to favorites
         setIsFavorite(true);
@@ -132,6 +136,9 @@ const Player = () => {
           },
           body: JSON.stringify({ songId: currentSong._id, userId })
         });
+        
+        // Notify other components about the change
+        notifyFavoritesChanged();
       }
     } catch (err) {
       console.error('Error toggling favorite status:', err);
