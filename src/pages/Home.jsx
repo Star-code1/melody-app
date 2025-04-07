@@ -18,7 +18,7 @@ const Home = () => {
     // Fetch songs from API
     const fetchSongs = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/songs');
+        const response = await axios.get('https://melody-t9y4.onrender.com/api/songs');
         setSongs(response.data);
         setLoading(false);
       } catch (err) {

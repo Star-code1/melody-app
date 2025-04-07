@@ -55,7 +55,7 @@ const Player = () => {
       
       try {
         const userId = JSON.parse(token)._id;
-        const response = await fetch(`http://localhost:5000/api/songs/liked?userId=${userId}`, {
+        const response = await fetch(`https://melody-t9y4.onrender.com/api/songs/liked?userId=${userId}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
@@ -70,7 +70,7 @@ const Player = () => {
         // Check if currentSong._id exists, if not try to find the song in the database
         if (!currentSong._id && currentSong.title) {
           // Try to find the song by title and artist
-          const searchResponse = await fetch(`http://localhost:5000/api/songs/search?query=${encodeURIComponent(currentSong.title)}`, {
+          const searchResponse = await fetch(`https://melody-t9y4.onrender.com/api/songs/search?query=${encodeURIComponent(currentSong.title)}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json'
@@ -116,7 +116,7 @@ const Player = () => {
       if (isFavorite) {
         // Remove from favorites
         setIsFavorite(false);
-        await fetch('http://localhost:5000/api/songs/liked', {
+        await fetch('https://melody-t9y4.onrender.com/api/songs/liked', {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json'
@@ -129,7 +129,7 @@ const Player = () => {
       } else {
         // Add to favorites
         setIsFavorite(true);
-        await fetch('http://localhost:5000/api/songs/liked', {
+        await fetch('https://melody-t9y4.onrender.com/api/songs/liked', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

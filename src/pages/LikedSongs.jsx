@@ -40,7 +40,7 @@ const LikedSongsPage = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/songs/liked?userId=${userId}`, {
+      const response = await fetch(`https://melody-t9y4.onrender.com/api/songs/liked?userId=${userId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -111,7 +111,7 @@ const LikedSongsPage = () => {
     try {
       setLikedSongs(prev => prev.filter(song => song._id !== songId));
       
-      const response = await fetch('http://localhost:5000/api/songs/liked', {
+      const response = await fetch('https://melody-t9y4.onrender.com/api/songs/liked', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'

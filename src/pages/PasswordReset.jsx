@@ -24,7 +24,7 @@ const PasswordReset = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.get(`http://localhost:5000/api/users/check-email?email=${email}`);
+            const response = await axios.get(`https://melody-t9y4.onrender.com/api/users/check-email?email=${email}`);
     
             if (response.data.exists) {
                 setShowModal(true);
@@ -65,7 +65,7 @@ const PasswordReset = () => {
         }
     
         try {
-            const response = await axios.post("http://localhost:5000/api/users/forgot-password", {
+            const response = await axios.post("https://melody-t9y4.onrender.com/api/users/forgot-password", {
                 email,
                 newPassword: password
             });

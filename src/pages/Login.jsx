@@ -54,7 +54,7 @@ function Login() {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post("http://localhost:5000/api/users/login", {
+            const response = await axios.post("https://melody-t9y4.onrender.com/api/users/login", {
                 email: username, // Giả sử username chứa email hoặc tên người dùng
                 password: password,
             });
@@ -100,11 +100,11 @@ function Login() {
             }
     
             // Kiểm tra email có tồn tại trong hệ thống chưa
-            const checkEmailResponse = await axios.get(`http://localhost:5000/api/users/check-email?email=${email}`);
+            const checkEmailResponse = await axios.get(`https://melody-t9y4.onrender.com/api/users/check-email?email=${email}`);
     
             if (checkEmailResponse.data.exists) {
                 // Email đã tồn tại => Đăng nhập bình thường
-                const loginResponse = await axios.post("http://localhost:5000/api/users/google-login", { email });
+                const loginResponse = await axios.post("https://melody-t9y4.onrender.com/api/users/google-login", { email });
     
                 if (loginResponse.status === 200) {
                     localStorage.setItem("token", JSON.stringify(loginResponse.data.user));
@@ -120,7 +120,7 @@ function Login() {
                 }
             } else {
                 // Email chưa tồn tại => Tiến hành đăng ký
-                const registerResponse = await axios.post("http://localhost:5000/api/users/", {
+                const registerResponse = await axios.post("https://melody-t9y4.onrender.com/api/users/", {
                     email,
                     name,
                     gender: "Nam",

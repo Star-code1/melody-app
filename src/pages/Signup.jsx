@@ -75,7 +75,7 @@ function Signup() {
     }
     
     try {
-        const response = await axios.get(`http://localhost:5000/api/users/check-email?email=${email}`);
+        const response = await axios.get(`https://melody-t9y4.onrender.com/api/users/check-email?email=${email}`);
         if (response.data.exists) {
             return 1;
         }
@@ -112,11 +112,11 @@ function Signup() {
           }
 
           // Kiểm tra email có tồn tại trong hệ thống chưa
-          const checkEmailResponse = await axios.get(`http://localhost:5000/api/users/check-email?email=${email}`);
+          const checkEmailResponse = await axios.get(`https://melody-t9y4.onrender.com/api/users/check-email?email=${email}`);
 
           if (checkEmailResponse.data.exists) {
               // Email đã tồn tại => Đăng nhập bình thường
-              const loginResponse = await axios.post("http://localhost:5000/api/users/google-login", { email });
+              const loginResponse = await axios.post("https://melody-t9y4.onrender.com/api/users/google-login", { email });
 
               if (loginResponse.status === 200) {
                   localStorage.setItem("token", JSON.stringify(loginResponse.data.user));
@@ -129,7 +129,7 @@ function Signup() {
               }
           } else {
               // Email chưa tồn tại => Tiến hành đăng ký
-              const registerResponse = await axios.post("http://localhost:5000/api/users/", {
+              const registerResponse = await axios.post("https://melody-t9y4.onrender.com/api/users/", {
                   email,
                   name,
                   gender: "Nam",
@@ -251,7 +251,7 @@ function Signup() {
             console.log("Dữ liệu gửi lên server:", userData);
 
             // Gửi dữ liệu lên backend
-            const response = await axios.post("http://localhost:5000/api/users", userData);
+            const response = await axios.post("https://melody-t9y4.onrender.com/api/users", userData);
 
             if (response.status === 201) {
                 const token = response.data;
