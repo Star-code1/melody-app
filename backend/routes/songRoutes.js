@@ -43,7 +43,7 @@ const uploadToCloudinary = (buffer, options) => {
         resolve(result);
       }
     );
-    
+
     streamifier.createReadStream(buffer).pipe(uploadStream);
   });
 };
@@ -58,28 +58,28 @@ router.post(
   async (req, res) => {
     try {
       if (!req.files || !req.files.audioFile || !req.files.imageFile) {
-        return res.status(400).json({ 
-          error: "Both audio and image files are required." 
+        return res.status(400).json({
+          error: "Both audio and image files are required.",
         });
       }
 
       const { title, description, artist } = req.body;
-      
+
       // Upload file audio vào folder "audio"
       const audioResult = await uploadToCloudinary(
         req.files.audioFile[0].buffer,
-        { 
+        {
           resource_type: "auto", // Tự động nhận diện resource type
-          folder: "audio" // Chỉ định folder audio
+          folder: "audio", // Chỉ định folder audio
         }
       );
-      
-      // Upload file image vào folder "images" 
+
+      // Upload file image vào folder "images"
       const imageResult = await uploadToCloudinary(
         req.files.imageFile[0].buffer,
-        { 
+        {
           resource_type: "image",
-          folder: "images" // Chỉ định folder images
+          folder: "images", // Chỉ định folder images
         }
       );
 
@@ -99,20 +99,28 @@ router.post(
     }
   }
 );
+
+// Remove duplicate route and replace with a single GET endpoint
 router.get("/", async (req, res) => {
   try {
     const songs = await Song.find().sort({ createdAt: -1 });
     res.status(200).json(songs);
   } catch (err) {
+    console.error("Error fetching songs:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
-router.get("/", async (req, res) => {
+// GET route for single song by ID
+router.get("/:id", async (req, res) => {
   try {
-    const songs = await Song.find().sort({ createdAt: -1 });
-    res.status(200).json(songs);
+    const song = await Song.findById(req.params.id);
+    if (!song) {
+      return res.status(404).json({ error: "Song not found" });
+    }
+    res.status(200).json(song);
   } catch (err) {
+    console.error("Error fetching song:", err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -120,15 +128,15 @@ router.get("/", async (req, res) => {
 router.get("/search", async (req, res) => {
   try {
     const { query } = req.query;
-    
+
     if (!query) {
       return res.status(400).json({ error: "Cần cung cấp từ khóa tìm kiếm" });
     }
     const songs = await Song.find({
       $or: [
-        { title: { $regex: query, $options: "i" } },   
-        { artist: { $regex: query, $options: "i" } }   
-      ]
+        { title: { $regex: query, $options: "i" } },
+        { artist: { $regex: query, $options: "i" } },
+      ],
     }).sort({ createdAt: -1 });
     res.status(200).json(songs);
   } catch (err) {
@@ -142,7 +150,7 @@ router.get("/liked", async (req, res) => {
   const userId = req.query.userId;
   if (!userId) {
     return res.status(401).json({ error: "Unauthorized: Missing userId" });
-  } 
+  }
   try {
     const user = await User.findById(userId);
     if (!user) {
@@ -189,9 +197,8 @@ router.post("/liked", async (req, res) => {
     res.status(201).json({
       message: "Song added to liked songs",
       favoriteSongs,
-      user
+      user,
     });
-
   } catch (err) {
     console.error("Error adding song to liked songs:", err);
     res.status(500).json({ error: "Internal Server Error" });
@@ -228,7 +235,7 @@ router.delete("/liked", async (req, res) => {
 
     res.status(200).json({
       message: "Song removed from liked songs",
-      favoriteSongs: user.favoriteSongs
+      favoriteSongs: user.favoriteSongs,
     });
   } catch (err) {
     console.error("Error removing song from liked songs:", err);
