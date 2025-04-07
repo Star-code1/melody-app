@@ -1,31 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Home from "./pages/Home"
+import 'bootstrap/dist/css/bootstrap.css';
+import { BrowserRouter } from 'react-router-dom'; 
 import { Row, Col } from 'react-bootstrap';
 import Sidebar from './components/Sidebar';
-function App() {
- 
+import Page from './components/Page';
+import Header from './components/Header'
+import Player from './components/Player'
+import { MusicPlayerProvider } from './contexts/MusicPlayerContext';
 
+
+function App() {
+  
   return (
-    <div>
+    <BrowserRouter basename="/Melody"> 
+    <MusicPlayerProvider>
+      <div className='container-fluid vh-100' >
         <Row>
-          <Col md={2}>
-        <Sidebar></Sidebar>
+          <Col style={{ flex: "0.25", padding: "0" }}>
+            <Sidebar />
           </Col>
-          <Col>
-       <Router>
-        <Routes>
-          <Route path="/melody-app/" element={<Home />} ></Route>
-        </Routes>
-       </Router>
+          <Col  style={{padding: "0"}}>
+            <Header />
+            <Page />
           </Col>
         </Row>
       </div>
-  )
+      <Player></Player>
+      </MusicPlayerProvider>
+    </BrowserRouter>
+  );
 }
-
 export default App;
+
