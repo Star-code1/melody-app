@@ -12,7 +12,6 @@ const Home = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch songs from your API
     const fetchSongs = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/songs');

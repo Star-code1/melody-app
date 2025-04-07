@@ -18,6 +18,8 @@ const LikedSongsPage = () => {
     { id: 10, title: "Enchanted", artist: "taylor swift", album: "Speak Now", duration: "5:52", coverArt: "https://picsum.photos/200" },
   ];
 
+  
+
   const handlePlay = (songId) => {
     setCurrentSong(songId);
   };
@@ -28,29 +30,20 @@ const LikedSongsPage = () => {
     }
   };
 
-  // Custom styles
   const customStyles = {
-    container: {
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100%',
-      width: '100%',
-      overflow: 'hidden' // Prevent overflow on the container
-    },
     gradientHeader: {
-      background: 'linear-gradient(to right, rgba(220, 38, 38, 0.2), rgba(0, 0, 0, 0.8))',
-      flexShrink: 0 // Prevent header from shrinking
+      background: 'linear-gradient(to right, rgba(220, 38, 38, 0.2), rgba(0, 0, 0, 0.8))'
     },
     gradientNavbar: {
-      background: 'linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(0, 0, 0, 0.95))',
-      flexShrink: 0 // Prevent navbar from shrinking
+      background: 'linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(0, 0, 0, 0.95))'
     },
     gradientBackground: {
-      background: 'linear-gradient(to bottom, rgba(17, 24, 39, 0.95), rgba(0, 0, 0, 0.95))',
-      flex: '1 1 auto', // Allow content area to grow and shrink
-      overflow: 'auto', // Add scrollbar when content overflows
-      scrollbarWidth: 'thin',
-      scrollbarColor: '#dc2626 #1f2937'
+      background: 'linear-gradient(to bottom, rgba(17, 24, 39, 0.95), rgba(0, 0, 0, 0.95))'
+    },
+    gradientText: {
+      background: 'linear-gradient(to right, #dc2626, #f87171)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent'
     },
     hoverRow: {
       transition: 'all 0.3s ease'
@@ -68,31 +61,17 @@ const LikedSongsPage = () => {
       backgroundColor: '#ef4444',
       transform: 'scale(1.05)',
       boxShadow: '0 6px 16px rgba(220, 38, 38, 0.3)'
-    },
-    scrollbar: {
-      width: '8px',
-      backgroundColor: '#1f2937',
-      borderRadius: '4px'
-    },
-    scrollbarThumb: {
-      backgroundColor: 'rgba(220, 38, 38, 0.5)',
-      borderRadius: '4px',
-      transition: 'background-color 0.3s ease'
-    },
-    scrollbarThumbHover: {
-      backgroundColor: '#dc2626'
     }
   };
 
   return (
-    <div className="bg-dark text-white" style={customStyles.container} onClick={handleClickOutside}>
-      {/* Header */}
+    <div className="d-flex flex-column vh-100 bg-dark text-white" onClick={handleClickOutside}>
       <div className="d-flex p-4 align-items-end" style={customStyles.gradientHeader}>
         <div className="d-flex align-items-center justify-content-center rounded-3 shadow me-4" 
              style={{
                background: 'linear-gradient(135deg, #dc2626, #f87171)',
-               width: '160px',
-               height: '160px',
+               width: '120px',
+               height: '120px',
                transition: 'all 0.3s ease'
              }}
              onMouseOver={(e) => {
@@ -103,20 +82,20 @@ const LikedSongsPage = () => {
                e.currentTarget.style.transform = 'scale(1)';
                e.currentTarget.style.boxShadow = 'none';
              }}>
-          <Heart size={80} fill="white" color="white" />
+          <Heart size={60} fill="white" color="white" />
         </div>
         <div className="d-flex flex-column">
           <span className="text-uppercase small fw-semibold text-white-50">Playlist</span>
-          <h1 className="display-4 fw-bold mb-3 text-danger">Liked Songs</h1>
+          <h1 className="display-5 fw-bold mb-2 text-danger">Liked Songs</h1>
           <div className="d-flex align-items-center small">
             <span className="text-white-50">Những bài hát bạn yêu thích</span>
           </div>
         </div>
       </div>
 
-      {/* Player Controls */}
+
       <div className="px-4 py-3 d-flex align-items-center" style={customStyles.gradientNavbar}>
-        <button className="btn rounded d-flex align-items-center justify-content-center me-3" 
+        <button className="btn rounded-circle d-flex align-items-center justify-content-center me-3" 
                 style={customStyles.playButton}
                 onMouseOver={(e) => {
                   e.currentTarget.style.backgroundColor = '#ef4444';
@@ -144,8 +123,7 @@ const LikedSongsPage = () => {
         </button>
       </div>
 
-      {/* Song List */}
-      <div className="px-4" style={customStyles.gradientBackground}>
+      <div className="flex-grow-1 px-4 overflow-auto" style={customStyles.gradientBackground}>
         <table className="table table-dark table-borderless">
           <thead>
             <tr className="border-bottom border-secondary border-opacity-25 text-white-50">
@@ -272,7 +250,6 @@ const LikedSongsPage = () => {
         </table>
       </div>
 
-      {/* CSS for hover effects and scrollbar styling */}
       <style jsx>{`
         .song-number {
           transition: all 0.3s ease;
@@ -292,29 +269,6 @@ const LikedSongsPage = () => {
         tr:hover .play-button-mini {
           transform: scale(1) !important;
           transition: all 0.3s ease;
-        }
-        
-        /* Custom Scrollbar Styling */
-        /* For WebKit browsers (Chrome, Safari) */
-        ::-webkit-scrollbar {
-          width: 8px;
-          background-color: #1f2937;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-          background-color: rgba(220, 38, 38, 0.5);
-          border-radius: 4px;
-          transition: background-color 0.3s ease;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-          background-color: #dc2626;
-        }
-        
-        /* For Firefox */
-        * {
-          scrollbar-width: thin;
-          scrollbar-color: rgba(220, 38, 38, 0.5) #1f2937;
         }
       `}</style>
     </div>
