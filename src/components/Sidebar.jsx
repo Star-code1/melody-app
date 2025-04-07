@@ -16,7 +16,7 @@ function Sidebar() {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [uploadProgress, setUploadProgress] = useState(0);
-  
+
   const [songData, setSongData] = useState({
     title: "",
     description: "",
@@ -44,12 +44,12 @@ function Sidebar() {
     e.preventDefault();
     setLoading(true);
     setUploadProgress(10);
-    
+
     try {
       if (!songData.audioFile || !songData.imageFile) {
         throw new Error("Vui lòng chọn cả file nhạc và ảnh bìa");
       }
-      
+
       // Create a FormData object for file upload
       const formData = new FormData();
       formData.append('title', songData.title);
@@ -57,20 +57,21 @@ function Sidebar() {
       formData.append('artist', songData.artist);
       formData.append('audioFile', songData.audioFile);
       formData.append('imageFile', songData.imageFile);
-      
+
       // Log thông tin để debug
       console.log("File âm thanh:", songData.audioFile);
       console.log("File hình ảnh:", songData.imageFile);
-      
+
       setUploadProgress(30);
-      
-      // Upload directly to the server using multipart/form-data
+
+      // Upload the song data along with files to the backend
+      // Thay đổi endpoint từ /upload thành /upload-with-files để sử dụng API Cloudinary mới
       const response = await axios.post(
-        "http://localhost:5000/api/songs/upload-with-files", 
-        formData, 
+        "http://localhost:5000/api/songs/upload-with-files",
+        formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'multipart/form-data',
           },
           onUploadProgress: (progressEvent) => {
             const percentCompleted = Math.round(
@@ -80,12 +81,12 @@ function Sidebar() {
           }
         }
       );
-      
+
       setUploadProgress(100);
       setToastMessage("Bài hát đã được thêm thành công!");
       setShowToast(true);
       handleClose();
-      
+
       // Reset form
       setSongData({
         title: "",

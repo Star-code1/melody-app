@@ -1,178 +1,102 @@
 import express from "express";
 import multer from "multer";
-import cloudinary from "cloudinary";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
+import { v2 as cloudinary } from "cloudinary"; // Sử dụng v2 API
+import dotenv from "dotenv";
 import Song from "../models/Song.js";
+import streamifier from "streamifier"; // Thêm package này để xử lý buffer
+
+dotenv.config();
 
 const router = express.Router();
 
-
-// Update your CloudinaryStorage configuration to handle audio files correctly
-const cloudinaryStorage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'melody',
-    // Remove the resource_type here as it will be set conditionally per file
-    allowedFormats: ['jpg', 'png', 'mp3', 'wav'],
-    transformation: [{ quality: 'auto' }],
-    // Add this function to set the correct resource type based on file
-    resource_type: (req, file) => {
-      return file.mimetype.startsWith('audio/') ? 'video' : 'auto';
-    }    
-  }
+// Cấu hình Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Set up Cloudinary-based multer upload
-const cloudinaryUpload = multer({
-  storage: cloudinaryStorage,
-  limits: {
-    fileSize: 50 * 1024 * 1024 // Giới hạn kích thước file: 50MB
-  },
+// Cấu hình multer sử dụng memory storage
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
   fileFilter: (req, file, cb) => {
-    if (file.fieldname === 'audioFile' && !file.mimetype.startsWith('audio/')) {
-      return cb(new Error('Invalid audio file type'), false);
+    if (file.fieldname === "audioFile" && !file.mimetype.startsWith("audio/")) {
+      return cb(new Error("Invalid audio file type"), false);
     }
-    if (file.fieldname === 'imageFile' && !file.mimetype.startsWith('image/')) {
-      return cb(new Error('Invalid image file type'), false);
+    if (file.fieldname === "imageFile" && !file.mimetype.startsWith("image/")) {
+      return cb(new Error("Invalid image file type"), false);
     }
     cb(null, true);
-  }
+  },
 });
 
-// Upload song with files directly to Cloudinary
-router.post('/upload-with-files', (req, res, next) => {
-  cloudinaryUpload.fields([
-    { name: 'audioFile', maxCount: 1 },
-    { name: 'imageFile', maxCount: 1 }
-  ])(req, res, (err) => {
-    if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ error: 'File size exceeds the allowed limit (50MB).' });
-    } else if (err) {
-      return res.status(400).json({ error: err.message });
-    }
-    next();
-  });
-}, async (req, res) => {
-  try {
-    const { title, description, artist } = req.body;
-
-    if (!req.files || !req.files.audioFile || !req.files.imageFile) {
-      return res.status(400).json({ error: 'Both audio and image files are required.' });
-    }
-
-    const audioPath = req.files.audioFile[0].path;
-    const imagePath = req.files.imageFile[0].path;
-
-    const song = new Song({
-      title,
-      description: description || '',
-      artist,
-      audioPath,
-      imagePath
-    });
-
-    await song.save();
-    res.status(201).json(song);
-  } catch (err) {
-    console.error('Upload error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-
-// Keep the original upload route for compatibility with client-side uploads
-router.post('/upload', async (req, res) => {
-  try {
-    // Get data from request body
-    const { title, description, artist, audioPath, imagePath } = req.body;
-    
-    // Validate required fields
-    if (!title || !artist || !audioPath || !imagePath) {
-      return res.status(400).json({ 
-        error: 'Missing song information! Title, artist, audio URL and image URL are required.' 
-      });
-    }
-  
-    // Create new song with the provided URLs
-    const song = new Song({
-      title,
-      description: description || '',
-      artist,
-      audioPath,
-      imagePath
-    });
-  
-    // Save to database
-    await song.save();
-    res.status(201).json(song);
-  } catch (err) {
-    console.error('Upload error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// GET all songs
-router.get('/', async (req, res) => {
-  try {
-    const songs = await Song.find();
-    res.status(200).json(songs);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// GET song by ID
-router.get('/:id', async (req, res) => {
-  try {
-    const song = await Song.findById(req.params.id);
-    if (!song) {
-      return res.status(404).json({ error: 'Song not found' });
-    }
-    res.status(200).json(song);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// DELETE song
-router.delete('/:id', async (req, res) => {
-  try {
-    const song = await Song.findById(req.params.id);
-    if (!song) {
-      return res.status(404).json({ error: 'Song not found' });
-    }
-    
-    // Check if the song uses Cloudinary URLs
-    if (song.audioPath.includes('cloudinary.com')) {
-      try {
-        // Extract public IDs from Cloudinary URLs
-        const getPublicIdFromUrl = (url) => {
-          const parts = url.split('/');
-          const filename = parts.pop().split('.')[0];
-          const folder = parts[parts.length - 1];
-          return `${folder}/${filename}`;
-        };
-        
-        
-        const audioPublicId = getPublicIdFromUrl(song.audioPath);
-        const imagePublicId = getPublicIdFromUrl(song.imagePath);
-        
-        // Delete files from Cloudinary
-        await cloudinary.uploader.destroy(imagePublicId);
-        await cloudinary.uploader.destroy(audioPublicId, { resource_type: 'video' }); // audio files are 'video' type in Cloudinary
-      } catch (cloudinaryError) {
-        console.error('Error deleting from Cloudinary:', cloudinaryError);
-        // Continue with deleting the database entry even if Cloudinary deletion fails
+// Hàm upload file lên Cloudinary với promise
+const uploadToCloudinary = (buffer, options) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      options,
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
       }
+    );
+    
+    streamifier.createReadStream(buffer).pipe(uploadStream);
+  });
+};
+
+// Route upload file lên Cloudinary
+router.post(
+  "/upload-with-files",
+  upload.fields([
+    { name: "audioFile", maxCount: 1 },
+    { name: "imageFile", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      if (!req.files || !req.files.audioFile || !req.files.imageFile) {
+        return res.status(400).json({ 
+          error: "Both audio and image files are required." 
+        });
+      }
+
+      const { title, description, artist } = req.body;
+      
+      // Upload file audio vào folder "audio"
+      const audioResult = await uploadToCloudinary(
+        req.files.audioFile[0].buffer,
+        { 
+          resource_type: "auto", // Tự động nhận diện resource type
+          folder: "audio" // Chỉ định folder audio
+        }
+      );
+      
+      // Upload file image vào folder "images" 
+      const imageResult = await uploadToCloudinary(
+        req.files.imageFile[0].buffer,
+        { 
+          resource_type: "image",
+          folder: "images" // Chỉ định folder images
+        }
+      );
+
+      const song = new Song({
+        title,
+        description: description || "",
+        artist,
+        audioPath: audioResult.secure_url,
+        imagePath: imageResult.secure_url,
+      });
+
+      await song.save();
+      res.status(201).json(song);
+    } catch (err) {
+      console.error("Upload error:", err);
+      res.status(500).json({ error: err.message });
     }
-    
-    // Delete song from database
-    await Song.findByIdAndDelete(req.params.id);
-    
-    res.status(200).json({ message: 'Song deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
   }
-});
+);
 
 export default router;
