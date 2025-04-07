@@ -17,7 +17,7 @@ const UserSchema = new mongoose.Schema({
     songs: { type: mongoose.Schema.Types.Mixed, default: [] }, // Cho phép lưu bất kỳ dữ liệu gì
 
     // Mảng chứa danh sách bài hát yêu thích của người dùng
-    favoriteSongs: { type: mongoose.Schema.Types.Mixed, default: [] }, // Cho phép lưu bất kỳ dữ liệu gì
+    favoriteSongs: { type: Array, default: [], ref: 'Song' }, // Cho phép lưu bất kỳ dữ liệu gì
 }, { timestamps: true });
 
 export default mongoose.model("User", UserSchema);

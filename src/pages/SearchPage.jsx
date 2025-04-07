@@ -4,48 +4,120 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import axios from 'axios';
 const SearchPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [favorites, setFavorites] = useState([3]);
+  const [favorites, setFavorites] = useState([]);  // Change this to an empty array
   const [musicItems, setMusicItems] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [likedSongs, setLikedSongs] = useState([]);
 
-    useEffect(() => {
-      const fetchSongs = async () => {
-        try {
-          const response = await axios.get('http://localhost:5000/api/songs');
-          setMusicItems(response.data);
-        } catch (err) {
-          console.error(err);
-        }
-      };
+  useEffect(() => {
+    const fetchLikedSongs = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
   
-      fetchSongs();
-    }, []);
-
-    useEffect(() => {
-      const timer = setTimeout(() => {
-        if (searchTerm.trim()) {
-          searchSongs(searchTerm);
-        } else {
-          const fetchAllSongs = async () => {
-            try {
-              const response = await axios.get('http://localhost:5000/api/songs');
-              setMusicItems(response.data);
-            } catch (err) {
-              console.error(err);
-            }
-          };
-          fetchAllSongs();
-        }
-      }, 0);
+      let userId;
+      try {
+        userId = JSON.parse(token)._id;
+      } catch (err) {
+        console.error('Error parsing token:', err);
+        return;
+      }
   
-      return () => clearTimeout(timer);
-    }, [searchTerm]);
+      try {
+        const response = await fetch(`http://localhost:5000/api/songs/liked?userId=${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        const data = await response.json();
+        // Extract song IDs from liked songs
+        const likedSongIds = data.map(song => song._id);
+        setLikedSongs(likedSongIds);
+        setFavorites(likedSongIds); // Update favorites state with liked songs
+      } catch (err) {
+        console.error('Error fetching liked songs:', err);
+      }
+    };
+  
+    fetchLikedSongs();
+  }, [likedSongs.length]); // Refresh when liked songs count changes
 
-  const toggleFavorite = (id) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchTerm.trim()) {
+        searchSongs(searchTerm);
+      } else {
+        const fetchAllSongs = async () => {
+          try {
+            const response = await axios.get('http://localhost:5000/api/songs');
+            setMusicItems(response.data);
+          } catch (err) {
+            console.error(err);
+          }
+        };
+        fetchAllSongs();
+      }
+    }, 500); // Added a small delay for better UX
+  
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const toggleFavorite = async (id) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Please log in to manage favorite songs.');
+      return;
+    }
+    
+    let userId;
+    try {
+      userId = JSON.parse(token)._id;
+    } catch (err) {
+      console.error('Error parsing token:', err);
+      return;
+    }
+    
     if (favorites.includes(id)) {
+      // Remove from favorites
       setFavorites(favorites.filter(favId => favId !== id));
+      try {
+        const response = await fetch('http://localhost:5000/api/songs/liked', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ songId: id, userId })
+        });
+        const data = await response.json();
+        console.log(data.message);
+        // Update the likedSongs state
+        setLikedSongs(likedSongs.filter(songId => songId !== id));
+      } catch (err) {
+        console.error('Error removing liked song:', err);
+        // Revert UI state if API call fails
+        setFavorites([...favorites]);
+      }
     } else {
+      // Add to favorites
       setFavorites([...favorites, id]);
+      try {
+        const response = await fetch('http://localhost:5000/api/songs/liked', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ songId: id, userId })
+        });
+        const data = await response.json();
+        console.log(data.message);
+        // Update the likedSongs state
+        setLikedSongs([...likedSongs, id]);
+      } catch (err) {
+        console.error('Error adding liked song:', err);
+        // Revert UI state if API call fails
+        setFavorites(favorites.filter(favId => favId !== id));
+      }
     }
   };
 
@@ -158,7 +230,7 @@ const SearchPage = () => {
               <p className="text-secondary fs-5">Không tìm thấy bài hát nào phù hợp</p>
             </div>
           ) : (
-          <table className="table table-dark table-borderless">
+          <table className="table table-dark table-borderless" style={{marginBottom: '10rem'}}>
             <thead>
               <tr className="border-bottom border-secondary border-opacity-25 text-white-50">
                 <th className="ps-3 fw-bold fs-5 text-center">#</th>
@@ -255,7 +327,9 @@ const SearchPage = () => {
                           e.currentTarget.style.opacity = 0.75;
                           e.currentTarget.style.transform = 'scale(1)';
                         }}
-                        onClick={() => toggleFavorite(item._id)}
+                        onClick={() => {
+                          toggleFavorite(item._id);
+                        }}
                       >
                         <Heart 
                           size={24} 

@@ -4,6 +4,7 @@ import { v2 as cloudinary } from "cloudinary"; // Sử dụng v2 API
 import dotenv from "dotenv";
 import Song from "../models/Song.js";
 import streamifier from "streamifier"; // Thêm package này để xử lý buffer
+import User from "../models/User.js";
 
 dotenv.config();
 
@@ -124,6 +125,87 @@ router.get("/search", async (req, res) => {
     res.status(200).json(songs);
   } catch (err) {
     console.error("Search error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get liked songs for the current user
+router.get("/liked", async (req, res) => {
+  const userId = req.query.userId;
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized: Missing userId" });
+  } 
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const songIds = user.favoriteSongs;
+    const likedSongs = await Song.find({ _id: { $in: songIds } });
+    res.status(200).json(likedSongs);
+  } catch (err) {
+    console.error("Error getting liked songs:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.post("/liked", async (req, res) => {
+  try {
+    const { songId, userId } = req.body;
+
+    if (!songId) {
+      return res.status(400).json({ error: "Song ID is required" });
+    }
+
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is required" });
+    }
+    const songExists = await Song.findById(songId);
+    if (!songExists) {
+      return res.status(400).json({ error: "Invalid song ID" });
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
+
+    if (user.favoriteSongs.includes(songId)) {
+      return res.status(400).json({ error: "Song is already in liked songs" });
+    }
+
+    user.favoriteSongs.push(songId);
+    await user.save();
+    const updatedUser = await User.findById(userId);
+    const favoriteSongs = updatedUser.favoriteSongs;
+
+    res.status(201).json({
+      message: "Song added to liked songs",
+      favoriteSongs,
+      user
+    });
+
+  } catch (err) {
+    console.error("Error adding song to liked songs:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.delete("/liked/:songId", async (req, res) => {
+  try {
+    const { songId } = req.params;
+    const userId = req.user.id;
+
+    await FavoriteSong.findOneAndDelete({ userId, songId });
+    
+    const favorites = await FavoriteSong.find({ userId });
+    const favoriteSongIds = favorites.map(favorite => favorite.songId);
+    
+    res.status(200).json({ 
+      message: "Song removed from liked songs",
+      favoriteSongs: favoriteSongIds
+    });
+  } catch (err) {
+    console.error("Error removing song from liked songs:", err);
     res.status(500).json({ error: err.message });
   }
 });

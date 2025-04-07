@@ -1,24 +1,44 @@
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { Heart, Play, Clock, Music, MoreHorizontal, Ellipsis, UserPlus, Download, Trash2 } from 'lucide-react';
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 const LikedSongsPage = () => {
   const [currentSong, setCurrentSong] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
-  const likedSongs = [
-    { id: 1, title: "daylight", artist: "taylor swift", album: "Lover", duration: "4:53", coverArt: "https://picsum.photos/200" },
-    { id: 2, title: "Lavender Haze", artist: "taylor swift", album: "Midnights", duration: "3:22", coverArt: "https://picsum.photos/200" },
-    { id: 3, title: "august", artist: "taylor swift", album: "folklore", duration: "4:21", coverArt: "https://picsum.photos/200" },
-    { id: 4, title: "Anti-Hero", artist: "taylor swift", album: "Midnights", duration: "3:20", coverArt: "https://picsum.photos/200" },
-    { id: 5, title: "Love Story", artist: "taylor swift", album: "Fearless", duration: "3:55", coverArt: "https://picsum.photos/200" },
-    { id: 6, title: "Cruel Summer", artist: "taylor swift", album: "Lover", duration: "2:58", coverArt: "https://picsum.photos/200" },
-    { id: 7, title: "Blank Space", artist: "taylor swift", album: "1989", duration: "3:51", coverArt: "https://picsum.photos/200" },
-    { id: 8, title: "All Too Well", artist: "taylor swift", album: "Red", duration: "5:29", coverArt: "https://picsum.photos/200" },
-    { id: 9, title: "Wildest Dreams", artist: "taylor swift", album: "1989", duration: "3:40", coverArt: "https://picsum.photos/200" },
-    { id: 10, title: "Enchanted", artist: "taylor swift", album: "Speak Now", duration: "5:52", coverArt: "https://picsum.photos/200" },
-  ];
-
+  const [likedSongs, setLikedSongs] = useState([]);
+  useEffect(() => {
+    const fetchLikedSongs = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in to view your liked songs.');
+        return;
+      }
+      let userId;
+      try {
+        userId = JSON.parse(token)._id;
+      } catch (err) {
+        console.error('Error parsing token:', err);
+        alert('Invalid token format.');
+        return;
+      }
   
+      try {
+        const response = await fetch(`http://localhost:5000/api/songs/liked?userId=${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        const data = await response.json();
+        setLikedSongs(data);
+      } catch (err) {
+        console.error('Error fetching liked songs:', err);
+        alert('Failed to load liked songs. Please try again.');
+      }
+    };
+  
+    fetchLikedSongs();
+  }, []);
 
   const handlePlay = (songId) => {
     setCurrentSong(songId);
@@ -124,41 +144,37 @@ const LikedSongsPage = () => {
       </div>
 
       <div className="flex-grow-1 px-4 overflow-auto" style={customStyles.gradientBackground}>
-        <table className="table table-dark table-borderless">
+        <table className="table table-dark table-borderless " style={{marginBottom: '10rem'}}>
           <thead>
             <tr className="border-bottom border-secondary border-opacity-25 text-white-50">
-              <th className="ps-3 fw-bold fs-5 text-start">#</th>
+              <th className="ps-3 fw-bold fs-5 text-center">#</th>
               <th className="fw-bold fs-5 text-start">Tiêu đề</th>
-              <th className="fw-bold fs-5 text-start">Album</th>
-              <th className="text-end pe-4">
-                <Clock size={24} />
-              </th>
               <th className="text-end pe-2 w-auto"></th>
             </tr>
           </thead>
           <tbody>
             {likedSongs.map((song, index) => (
               <tr
-                key={song.id}
+                key={song._id}
                 className={`border-bottom border-secondary border-opacity-10 ${currentSong === song.id ? 'active' : ''}`}
                 style={{
                   ...customStyles.hoverRow,
-                  ...(currentSong === song.id ? customStyles.currentSongHighlight : {})
+                  ...(currentSong === song._id ? customStyles.currentSongHighlight : {})
                 }}
                 onMouseOver={(e) => {
                   e.currentTarget.style.background = 'linear-gradient(to right, rgba(17, 24, 39, 0.95), rgba(220, 38, 38, 0.1))';
                   e.currentTarget.style.borderLeft = '4px solid #dc2626';
                 }}
                 onMouseOut={(e) => {
-                  if (currentSong !== song.id) {
+                  if (currentSong !== song._id) {
                     e.currentTarget.style.background = '';
                     e.currentTarget.style.borderLeft = '';
                   }
                 }}
-                onDoubleClick={() => handlePlay(song.id)}
+                onDoubleClick={() => handlePlay(song._id)}
               >
                 <td className="ps-3 py-4 text-center position-relative">
-                  {currentSong === song.id ? (
+                  {currentSong === song._id ? (
                     <Music size={20} className="text-danger" />
                   ) : (
                     <span className="text-white-50 song-number">{index + 1}</span>
@@ -170,7 +186,7 @@ const LikedSongsPage = () => {
                     <div className="position-relative">
                       <div className={`position-absolute top-0 bottom-0 start-0 end-0 rounded-3 ${currentSong === song.id ? 'shadow-danger' : ''}`}></div>
                       <img 
-                        src={song.coverArt} 
+                        src={song.imagePath} 
                         alt={song.title} 
                         className="rounded-3 object-fit-cover border border-secondary" 
                         style={{
