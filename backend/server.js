@@ -4,48 +4,49 @@ import { fileURLToPath } from "url";
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
+import { v2 as cloudinary } from "cloudinary"; // Sửa thành v2 API
+
+import userRoutes from "./routes/userRoutes.js";
 import songRoutes from "./routes/songRoutes.js";
 
-dotenv.config();
-
-const app = express();
-const PORT = process.env.PORT || 5000;
-
-// Middleware
-app.use(cors(
-  {
-    origin: "https://melody-t9y4.onrender.com"  // Thay đổi với domain frontend của bạn
-  }
-));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Get the directory path
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Đường dẫn tĩnh tới thư mục 'dist' nằm ở root
-const frontendBuildPath = path.join(__dirname, "dist");
-app.use(express.static(frontendBuildPath));
+dotenv.config({ path: path.join(__dirname, ".env") });
 
-
-// API Routes - Mount with /api prefix
-app.use("/api/songs", songRoutes);
-
-// Catch-all route to serve React app
-app.get("*", (req, res) => {
-  res.sendFile(path.join(frontendBuildPath, "index.html"));
+// Cấu hình Cloudinary từ biến môi trường
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Connect to MongoDB
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log("Connected to MongoDB");
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error:", err);
-  });
+const app = express();
+const PORT = process.env.PORT || 5000;
+const MONGO_URI = process.env.MONGO_URI;
+
+mongoose.set("strictQuery", false);
+
+mongoose.connect(MONGO_URI)
+  .then(() => console.log("✅ MongoDB Atlas connected"))
+  .catch((err) => console.error("❌ MongoDB Atlas connection error:", err));
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Đăng ký router
+app.use("/api/users", userRoutes);
+app.use("/api/songs", songRoutes);
+
+// Phục vụ tệp tĩnh từ thư mục public (hình ảnh và audio)
+app.use("/public", express.static(path.join(__dirname, "public")));
+
+// Root route
+app.get("/", (req, res) => {
+  res.send("🎵 Music App API is running...");
+});
+
+app.listen(PORT, () =>
+  console.log(`🚀 Server is running on http://localhost:${PORT}`)
+);
