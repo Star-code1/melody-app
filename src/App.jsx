@@ -7,7 +7,11 @@ import Page from './components/Page';
 import Header from './components/Header'
 import Player from './components/Player'
 import { MusicPlayerProvider } from './contexts/MusicPlayerContext';
+import {disableReactDevTools} from '@fvilers/disable-react-devtools';
 
+if (process.env.NODE_ENV === 'production') {
+  disableReactDevTools();
+}
 
 function App() {
   
