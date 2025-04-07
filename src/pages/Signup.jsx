@@ -121,6 +121,7 @@ function Signup() {
               if (loginResponse.status === 200) {
                   localStorage.setItem("token", JSON.stringify(loginResponse.data.user));
                   alert("Tài khoản đã tồn tại ! Đang đăng nhập...");
+                  window.dispatchEvent(new Event("userAuthChanged"));
                   navigate("/");
               } else {
                   console.error("Server login error:", loginResponse.data);
@@ -143,6 +144,7 @@ function Signup() {
               if (registerResponse.status === 201) {
                   localStorage.setItem("token", JSON.stringify(registerResponse.data));
                   alert("Tạo tài khoản thành công! Đang đăng nhập...");
+                  window.dispatchEvent(new Event("userAuthChanged"));
                   navigate("/");
               } else {
                   console.error("Server register error:", registerResponse.data);
@@ -267,6 +269,7 @@ function Signup() {
                   agreeMarketing: false,
                   agreeSharing: false,
                 });
+                window.dispatchEvent(new Event("userAuthChanged"));
                 navigate("/");
             }
         } catch (error) {
@@ -290,14 +293,13 @@ function Signup() {
   
 
   return (
-    <Container className="d-flex align-items-center justify-content-center bg-dark text-white mt-3" 
-      style={{ height: "29.17rem", width: "20.83rem", borderRadius: "0.67rem" }}>
-      <div className="w-100 text-center" style={{ maxWidth: "16.67rem" }}>
-        <h2 className="text-center fw-bold mb-2" style={{ fontSize: "1.5rem" }}>Đăng ký để</h2>
-        <h3 className="text-center fw-bold" style={{ marginBottom: "3.33rem", fontSize: "1.25rem" }}>bắt đầu nghe</h3>
-        <Form>
+    <Container className="d-flex align-items-center justify-content-center bg-dark text-white" style={{ height: "700px",width: "500px",borderRadius: "10px" }}>
+      <div className="w-100 text-center" style={{ maxWidth: "400px" }}>
+        <h2 className="text-center  fw-bold mb-2">Đăng ký để</h2>
+        <h3 className="text-center fw-bold" style={{marginBottom:"50px"}}>bắt đầu nghe</h3>
+        <Form >
           <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label className="text-start w-100 fw-bold" style={{ fontSize: "1rem" }}>Địa chỉ email</Form.Label>
+            <Form.Label className="text-start w-100 fw-bold">Địa chỉ email</Form.Label>
             <Form.Control
               type="email"
               placeholder="name@domain.com"
@@ -307,44 +309,202 @@ function Signup() {
               className="bg-dark text-white"
             />
             {emailError && <span className="text-danger d-block text-start mt-2">{emailError}</span>}
+            
           </Form.Group>
           <Button
             variant="success"
             className="w-100 mb-3"
             onClick={handleShow}
-            style={{ height: "3.33rem", borderRadius: "2rem", color: "black", backgroundColor: "#1ed760", fontWeight: "bold" }}
+            style={{ height: "50px", borderRadius: "30px", color: "black", backgroundColor: "#1ed760", fontWeight: "bold" }}
+            
           >
             Tiếp theo
           </Button>
-          <div className="position-relative my-3">
-            <hr />
-            <span className="position-absolute top-50 start-50 translate-middle px-3 bg-dark text-white" style={{ fontSize: "1rem" }}>
-              Hoặc
-            </span>
-          </div>
+
+
+          <div className="position-relative my-4">
+                <hr />
+                <span className="position-absolute top-50 start-50 translate-middle px-3 bg-dark text-white">
+                    Hoặc
+                </span>
+            </div>
           <Form.Group className="mb-3">
             <GoogleOAuthProvider clientId={CLIENT_ID}>
-              <div className="d-flex justify-content-center mt-4">
-                <GoogleSignupButton onSuccess={handleGoogleLogin} />
-              </div>
+                <div className="d-flex justify-content-center mt-5">
+                  <GoogleSignupButton onSuccess={handleGoogleLogin}/>
+                </div>
             </GoogleOAuthProvider>
           </Form.Group>
-          <p className="text-white-50 text-center mt-3" style={{ fontSize: "0.9rem" }}>
-            Bạn đã có tài khoản?{" "}
-            <span
-              style={{ color: "white", textDecoration: "underline", cursor: "pointer" }}
-              onMouseOver={(e) => (e.target.style.color = "#1ed760")}
-              onMouseOut={(e) => (e.target.style.color = "white")}
-              onClick={() => navigate("/Login")}
-            >
-              Đăng nhập tại đây
-            </span>
+          
+          <p className="text-white-50 text-center mt-3">Bạn đã có tài khoản? <span
+            style={{ color: "white", textDecoration: "underline", cursor: "pointer" }}
+            onMouseOver={(e) => (e.target.style.color = "#1ed760")}
+            onMouseOut={(e) => (e.target.style.color = "white")}
+            onClick={() => navigate("/Login")}
+          >Đăng nhập tại đây</span>
           </p>
         </Form>
       </div>
+      <Modal show={show} onHide={handleClose} centered >
+        <Modal.Header closeButton className="p-4 text-white border" style={{ backgroundColor: "#121212" }}>
+          <Modal.Title>
+            Bước {step} của 3 <br />
+            
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="p-4 text-white border" style={{ backgroundColor: "#121212" }}>
+          <ProgressBar now={progressPercentage} className="mb-3" variant="success" />
+          <Form onSubmit={handleSubmit}>
+            {step === 1 && (
+              <>
+                <Form.Group controlId="password">
+                  <h3>Tạo mật khẩu</h3>
+                  <Form.Label>Mật khẩu</Form.Label>
+                  <div className="position-relative">
+                    <Form.Control
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="p-3 bg-dark text-white border-0"
+                      required
+                    />
+                    <span
+                      className="position-absolute top-50 end-0 translate-middle-y me-3"
+                      style={{ cursor: "pointer" }}
+                      onClick={togglePasswordVisibility}
+                    >
+                    {showPassword ? <FaEyeSlash color="white" /> : <FaEye color="white" />}
+                    </span>
+                  </div>
+                  
+                </Form.Group>
+                {errors.password && <p className="text-danger small">{errors.password}</p>}
+                <ul className="small mt-2">
+                  <li>Ít nhất 8 ký tự</li>
+                  <li>1 chữ số hoặc ký tự đặc biệt (ví dụ: # ? ! &)</li>
+                  <li>1 chữ cái in hoa</li>
+                </ul>
+                <div className="d-flex align-items-start mt-3">
+                  <Button variant="primary" onClick={nextStep} className="mt-3 ms-auto" >
+                    Tiếp theo
+                  </Button>
+                </div>
+              </>
+            )}
+            {step === 2 && (
+              <>
+                <h3>Giới thiệu thông tin về bản thân bạn</h3>
+                <Form.Group controlId="name">
+                  <Form.Label>Tên</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    className="p-3 bg-dark text-white border-0"
+                  />
+                  {errors.name && <p className="text-danger small">{errors.name}</p>}
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Ngày sinh</Form.Label>
+                  <div className="d-flex gap-2">
+                    <Form.Control
+                      type="text"
+                      name="day"
+                      placeholder="dd"
+                      value={formData.day}
+                      onChange={handleChange}
+                      required
+                      className="p-3 bg-dark text-white border-0"
+                    />
+                    <Form.Control
+                      as="select"
+                      name="month"
+                      value={formData.month}
+                      onChange={handleChange}
+                      required
+                      className="p-3 bg-dark text-white border-0"
+                    >
+                      <option value="">Tháng</option>
+                      {[...Array(12)].map((_, i) => (
+                        <option key={i + 1} value={i + 1}>{i + 1}</option>
+                      ))}
+                    </Form.Control>
+                    <Form.Control
+                      type="text"
+                      name="year"
+                      placeholder="yyyy"
+                      value={formData.year}
+                      onChange={handleChange}
+                      required
+                      className="p-3 bg-dark text-white border-0"
+                    />
+                  </div>
+                  {errors.birthdate && <p className="text-danger small">{errors.birthdate}</p>}
+                </Form.Group>
+                <Form.Group>
+                <Form.Label>Giới tính</Form.Label>
+                <div className="d-flex gap-3 flex-wrap">
+                  <Form.Check type="radio" label="Nam" name="gender" value="Nam" checked={formData.gender === "Nam"} onChange={handleChange} />
+                  <Form.Check type="radio" label="Nữ" name="gender" value="Nữ" checked={formData.gender === "Nữ"} onChange={handleChange} />
+                  <Form.Check type="radio" label="Khác" name="gender" value="Khác" checked={formData.gender === "Khác"} onChange={handleChange} />
+                  
+                </div>
+                {errors.gender && <p className="text-danger small">{errors.gender}</p>}
+                </Form.Group>
+                <div className="d-flex justify-content-between mt-3">
+                  <Button variant="secondary" onClick={prevStep}>
+                    Quay lại
+                  </Button>
+                  <Button variant="primary" onClick={nextStep}>
+                    Tiếp theo
+                  </Button>
+                </div>
+              </>
+            )}
+            {step === 3 && (
+              <>
+                <h3>Điều khoản & Điều kiện</h3>
+                <Form.Group controlId="agreeMarketing" className="mb-2">
+                  <Form.Check
+                    type="checkbox"
+                    label="Tôi không muốn nhận tin nhắn tiếp thị từ App"
+                    name="agreeMarketing"
+                    checked={formData.agreeMarketing}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group controlId="agreeSharing" className="mb-3">
+                  <Form.Check
+                    type="checkbox"
+                    label="Chia sẻ dữ liệu đăng ký của tôi với các nhà cung cấp nội dung cho mục đích tiếp thị."
+                    name="agreeSharing"
+                    checked={formData.agreeSharing}
+                    onChange={handleChange}
+                    required
+                  />
+                </Form.Group>
+                <p className="small text-muted">
+                  Bằng việc nhấp vào nút Đăng ký, bạn đồng ý với Điều khoản & Điều kiện sử dụng của App.
+                  
+                </p>
+                {errors.terms && <p className="text-danger small">{errors.terms}</p>}
+                <div className="d-flex justify-content-center mt-3">
+                  <Button variant="success" type="submit" className="px-5">
+                    Đăng ký
+                  </Button>
+                </div>
+              </>
+            )}
+          </Form>
+        </Modal.Body>
+      </Modal>
     </Container>
+
   );
-  
 }
 
 export default Signup;
