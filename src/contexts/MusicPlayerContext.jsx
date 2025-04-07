@@ -121,36 +121,50 @@ export const MusicPlayerProvider = ({ children }) => {
   }, [volume, isMuted]);
 
   // Play a specific song
-  const playSong = (song, allSongs = []) => {
-    // Check if song exists in current playlist
-    const existingIndex = playlist.findIndex(
-      (item) => item.audioUrl === song.audioUrl || item.id === song.id
-    );
+  const playSong = async (song) => {
+    try {
+      // Kiểm tra xem song có _id chưa
+      if (!song._id && song.title) {
+        // Thử tìm bài hát theo title và artist
+        const response = await fetch(
+          `http://localhost:5000/api/songs/search?query=${encodeURIComponent(
+            song.title
+          )}`
+        );
+        const data = await response.json();
+        const matchingSong = data.find(
+          (item) =>
+            item.title.toLowerCase() === song.title.toLowerCase() &&
+            item.artist.toLowerCase() === song.artist.toLowerCase()
+        );
 
-    if (allSongs && allSongs.length > 0) {
-      // Case 1: New playlist provided
-      setPlaylist(allSongs);
-      const index = allSongs.findIndex(
-        (item) => item.audioUrl === song.audioUrl || item.id === song.id
-      );
-      setCurrentSongIndex(index !== -1 ? index : 0);
-    } else if (existingIndex !== -1) {
-      // Case 2: Song already exists in playlist
-      setCurrentSongIndex(existingIndex);
-    } else {
-      // Case 3: New song not in playlist
-      setPlaylist((prev) => {
-        const newPlaylist = [...prev, song];
-        // Set the index to the last position of the new playlist
-        setCurrentSongIndex(newPlaylist.length - 1);
-        return newPlaylist;
-      });
+        if (matchingSong) {
+          // Cập nhật _id từ bài hát đã tìm thấy
+          song._id = matchingSong._id;
+
+          // Cập nhật các trường khác nếu cần
+          if (!song.imagePath && matchingSong.imagePath) {
+            song.imagePath = matchingSong.imagePath;
+          }
+        }
+      }
+
+      // Tiếp tục logic playSong hiện tại
+      setCurrentSong(song);
+      setIsPlaying(true);
+      setShowPlayer(true);
+
+      // Đảm bảo audioRef được cập nhật với URL mới
+      if (audioRef.current) {
+        audioRef.current.src = song.audioPath || song.url;
+        audioRef.current.load();
+        audioRef.current.play().catch((err) => {
+          console.error("Error playing audio:", err);
+        });
+      }
+    } catch (err) {
+      console.error("Error playing song:", err);
     }
-
-    setCurrentSong(song);
-    setShowPlayer(true);
-    setIsPlaying(true);
-    setLiked(false);
   };
 
   // Close the player

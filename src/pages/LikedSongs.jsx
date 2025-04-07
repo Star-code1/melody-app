@@ -149,7 +149,7 @@ const LikedSongsPage = () => {
             <tr className="border-bottom border-secondary border-opacity-25 text-white-50">
               <th className="ps-3 fw-bold fs-5 text-center">#</th>
               <th className="fw-bold fs-5 text-start">Tiêu đề</th>
-              <th className="text-end pe-2 w-auto"></th>
+
             </tr>
           </thead>
           <tbody>
@@ -222,43 +222,6 @@ const LikedSongsPage = () => {
                       <div className="text-secondary">{song.artist}</div>
                     </div>
                   </div>
-                </td>
-                <td className="py-3 text-secondary fs-6">{song.album}</td>
-                <td className="py-3 text-end text-secondary fs-6 pe-4">{song.duration}</td>
-                <td className="py-3 text-end position-relative pe-4" onClick={(e) => {
-                  e.stopPropagation();
-                  setActiveMenu(activeMenu === song._id ? null : song._id);
-                }}>
-                  <Ellipsis size={24} className="song-more-icon" style={{opacity: 0, transition: 'all 0.3s ease'}} />
-                  {activeMenu === song._id && (
-                    <div className="position-absolute end-0 top-10 bg-dark rounded-3 shadow-lg py-2 mt-2 dropdown-menu show" 
-                         style={{
-                           width: '200px',
-                           zIndex: 10,
-                           background: 'rgba(17, 24, 39, 0.95)',
-                           border: '1px solid rgba(255, 255, 255, 0.1)'
-                         }}>
-                      <button className="dropdown-item text-white d-flex align-items-center px-3 py-2 small"
-                              onMouseOver={(e) => e.currentTarget.style.background = 'linear-gradient(to right, rgba(55, 65, 81, 0.8), rgba(220, 38, 38, 0.1))'}
-                              onMouseOut={(e) => e.currentTarget.style.background = ''}>
-                        <UserPlus size={16} className="me-3" />
-                        <span>Add to playlist</span>
-                      </button>
-                      <button className="dropdown-item text-white d-flex align-items-center px-3 py-2 small"
-                              onMouseOver={(e) => e.currentTarget.style.background = 'linear-gradient(to right, rgba(55, 65, 81, 0.8), rgba(220, 38, 38, 0.1))'}
-                              onMouseOut={(e) => e.currentTarget.style.background = ''}>
-                        <Download size={16} className="me-3" />
-                        <span>Download</span>
-                      </button>
-                      <div className="dropdown-divider border-secondary my-1"></div>
-                      <button className="dropdown-item text-danger d-flex align-items-center px-3 py-2 small"
-                              onMouseOver={(e) => e.currentTarget.style.background = 'linear-gradient(to right, rgba(55, 65, 81, 0.8), rgba(220, 38, 38, 0.1))'}
-                              onMouseOut={(e) => e.currentTarget.style.background = ''}>
-                        <Trash2 size={16} className="me-3" />
-                        <span>Delete</span>
-                      </button>
-                    </div>
-                  )}
                 </td>
               </tr>
             ))}

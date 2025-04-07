@@ -8,6 +8,7 @@ const SearchPage = () => {
   const [musicItems, setMusicItems] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [likedSongs, setLikedSongs] = useState([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // Add refresh trigger state
 
   useEffect(() => {
     const fetchLikedSongs = async () => {
@@ -31,8 +32,10 @@ const SearchPage = () => {
         });
         
         const data = await response.json();
+        console.log("Fetched liked songs:", data);
         // Extract song IDs from liked songs
         const likedSongIds = data.map(song => song._id);
+        console.log("Liked song IDs:", likedSongIds);
         setLikedSongs(likedSongIds);
         setFavorites(likedSongIds); // Update favorites state with liked songs
       } catch (err) {
@@ -41,7 +44,7 @@ const SearchPage = () => {
     };
   
     fetchLikedSongs();
-  }, [likedSongs.length]); // Refresh when liked songs count changes
+  }, [refreshTrigger]); // Use refresh trigger instead of likedSongs.length to prevent infinite loops
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -79,9 +82,11 @@ const SearchPage = () => {
     }
     
     if (favorites.includes(id)) {
-      // Remove from favorites
+      // Remove from favorites locally first (optimistic UI update)
       setFavorites(favorites.filter(favId => favId !== id));
+      
       try {
+        // Send DELETE request to remove from liked songs
         const response = await fetch('http://localhost:5000/api/songs/liked', {
           method: 'DELETE',
           headers: {
@@ -89,19 +94,28 @@ const SearchPage = () => {
           },
           body: JSON.stringify({ songId: id, userId })
         });
+        
+        if (!response.ok) {
+          throw new Error('Failed to remove from favorites');
+        }
+        
         const data = await response.json();
         console.log(data.message);
-        // Update the likedSongs state
-        setLikedSongs(likedSongs.filter(songId => songId !== id));
+        
+        // Refresh the liked songs list
+        setRefreshTrigger(prev => prev + 1);
       } catch (err) {
         console.error('Error removing liked song:', err);
         // Revert UI state if API call fails
-        setFavorites([...favorites]);
+        setFavorites(prev => [...prev, id]);
+        alert('Failed to remove from favorites. Please try again.');
       }
     } else {
-      // Add to favorites
-      setFavorites([...favorites, id]);
+      // Add to favorites locally first (optimistic UI update)
+      setFavorites(prev => [...prev, id]);
+      
       try {
+        // Send POST request to add to liked songs
         const response = await fetch('http://localhost:5000/api/songs/liked', {
           method: 'POST',
           headers: {
@@ -109,14 +123,21 @@ const SearchPage = () => {
           },
           body: JSON.stringify({ songId: id, userId })
         });
+        
+        if (!response.ok) {
+          throw new Error('Failed to add to favorites');
+        }
+        
         const data = await response.json();
         console.log(data.message);
-        // Update the likedSongs state
-        setLikedSongs([...likedSongs, id]);
+        
+        // Refresh the liked songs list
+        setRefreshTrigger(prev => prev + 1);
       } catch (err) {
         console.error('Error adding liked song:', err);
         // Revert UI state if API call fails
-        setFavorites(favorites.filter(favId => favId !== id));
+        setFavorites(prev => prev.filter(favId => favId !== id));
+        alert('Failed to add to favorites. Please try again.');
       }
     }
   };
