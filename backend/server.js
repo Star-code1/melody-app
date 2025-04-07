@@ -12,7 +12,11 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors(
+  {
+    origin: "https://melody-t9y4.onrender.com"  // Thay đổi với domain frontend của bạn
+  }
+));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -20,17 +24,13 @@ app.use(express.urlencoded({ extended: true }));
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve static files
-const frontendBuildPath = path.join(__dirname, "../frontend/dist");
+// Đường dẫn tĩnh tới thư mục 'dist' nằm ở root
+const frontendBuildPath = path.join(__dirname, "dist");
 app.use(express.static(frontendBuildPath));
+
 
 // API Routes - Mount with /api prefix
 app.use("/api/songs", songRoutes);
-
-// Handle static asset requests
-app.get("/BackGround.png", (req, res) => {
-  res.sendFile(path.join(frontendBuildPath, "BackGround.png"));
-});
 
 // Catch-all route to serve React app
 app.get("*", (req, res) => {
