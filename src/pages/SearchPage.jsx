@@ -4,7 +4,6 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import { useMusicPlayer } from "../contexts/MusicPlayerContext";
 import axios from 'axios';
 import { notifyFavoritesChanged } from '../utils/favoritesManager';
-import { useMusicPlayer } from '../contexts/MusicPlayerContext';
 
 const SearchPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -28,9 +27,7 @@ const SearchPage = () => {
   const handlePlaySong = (song) => {
     playSong(song, musicItems);
     setCurrentPlayingId(song._id);
-  };
-
-  const { playSong } = useMusicPlayer();
+  }
     
   const handlePlayClick = (item) => {
     const song = {

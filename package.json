@@ -25,6 +25,7 @@
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.482.0",
     "Melody": "file:",
+    "mongodb": "^6.15.0",
     "mongoose": "^8.12.1",
     "multer-storage-cloudinary": "^4.0.0",
     "nodemon": "^3.1.9",
