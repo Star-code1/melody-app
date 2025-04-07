@@ -198,19 +198,37 @@ router.post("/liked", async (req, res) => {
   }
 });
 
-router.delete("/liked/:songId", async (req, res) => {
+router.delete("/liked", async (req, res) => {
   try {
-    const { songId } = req.params;
-    const userId = req.user.id;
+    const { songId, userId } = req.body;
 
-    await FavoriteSong.findOneAndDelete({ userId, songId });
-    
-    const favorites = await FavoriteSong.find({ userId });
-    const favoriteSongIds = favorites.map(favorite => favorite.songId);
-    
-    res.status(200).json({ 
+    if (!songId) {
+      return res.status(400).json({ error: "Song ID is required" });
+    }
+
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is required" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Check if the song is in the user's favorites
+    if (!user.favoriteSongs.includes(songId)) {
+      return res.status(400).json({ error: "Song is not in liked songs" });
+    }
+
+    // Remove the song from favoriteSongs array
+    user.favoriteSongs = user.favoriteSongs.filter(
+      (id) => id.toString() !== songId
+    );
+    await user.save();
+
+    res.status(200).json({
       message: "Song removed from liked songs",
-      favoriteSongs: favoriteSongIds
+      favoriteSongs: user.favoriteSongs
     });
   } catch (err) {
     console.error("Error removing song from liked songs:", err);

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Play,
   Pause,
@@ -12,7 +12,8 @@ import {
   Heart,
   X
 } from "lucide-react";
-import { useMusicPlayer } from "../contexts/MusicPlayerContext";
+import { useMusicPlayer } from "../contexts/MusicPlayerContext"; // Thay đổi import sử dụng file MusicPlayerContext
+import { notifyFavoritesChanged } from '../utils/favoritesManager';
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const Player = () => {
@@ -41,6 +42,111 @@ const Player = () => {
     formatTime,
     audioRef, // Assuming you have an audioRef in your context
   } = useMusicPlayer();
+
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  // Check if current song is in favorites when it changes
+  useEffect(() => {
+    if (!currentSong) return;
+    
+    const checkFavoriteStatus = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      
+      try {
+        const userId = JSON.parse(token)._id;
+        const response = await fetch(`http://localhost:5000/api/songs/liked?userId=${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        const data = await response.json();
+        // Logging for debugging
+        console.log("Current song:", currentSong);
+        console.log("Liked songs:", data);
+        
+        // Check if currentSong._id exists, if not try to find the song in the database
+        if (!currentSong._id && currentSong.title) {
+          // Try to find the song by title and artist
+          const searchResponse = await fetch(`http://localhost:5000/api/songs/search?query=${encodeURIComponent(currentSong.title)}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          const searchResults = await searchResponse.json();
+          // Find a matching song
+          const matchingSong = searchResults.find(song => 
+            song.title.toLowerCase() === currentSong.title.toLowerCase() && 
+            song.artist.toLowerCase() === currentSong.artist.toLowerCase()
+          );
+          
+          if (matchingSong) {
+            // Store the found ID to use for checks
+            currentSong._id = matchingSong._id;
+            console.log("Found matching song ID:", matchingSong._id);
+          }
+        }
+        
+        const likedSongIds = data.map(song => song._id);
+        const isInFavorites = currentSong._id && likedSongIds.includes(currentSong._id);
+        console.log("Is in favorites:", isInFavorites);
+        setIsFavorite(isInFavorites);
+      } catch (err) {
+        console.error('Error checking favorite status:', err);
+      }
+    };
+    
+    checkFavoriteStatus();
+  }, [currentSong]);
+
+  // Handle toggling favorite status
+  const handleToggleFavorite = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Please log in to manage favorite songs.');
+      return;
+    }
+    
+    try {
+      const userId = JSON.parse(token)._id;
+      
+      if (isFavorite) {
+        // Remove from favorites
+        setIsFavorite(false);
+        await fetch('http://localhost:5000/api/songs/liked', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ songId: currentSong._id, userId })
+        });
+        
+        // Notify other components about the change
+        notifyFavoritesChanged();
+      } else {
+        // Add to favorites
+        setIsFavorite(true);
+        await fetch('http://localhost:5000/api/songs/liked', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ songId: currentSong._id, userId })
+        });
+        
+        // Notify other components about the change
+        notifyFavoritesChanged();
+      }
+    } catch (err) {
+      console.error('Error toggling favorite status:', err);
+      // Revert UI state if API call fails
+      setIsFavorite(!isFavorite);
+      alert('Failed to update favorites. Please try again.');
+    }
+  };
 
   // Add onEnded event listener to the audio element
   React.useEffect(() => {
@@ -174,7 +280,7 @@ const Player = () => {
           {/* Song information */}
           <div className="col-md-3 d-flex align-items-center">
             <img
-              src={currentSong.coverUrl || "/placeholder-cover.jpg"}
+              src={currentSong.imagePath || currentSong.coverUrl || "/placeholder-cover.jpg"}
               alt={`${currentSong.title} cover`}
               style={customStyles.coverImage}
             />
@@ -184,13 +290,13 @@ const Player = () => {
             </div>
             <button
               className="ms-3"
-              onClick={toggleLike}
+              onClick={handleToggleFavorite}
               style={{
                 ...customStyles.controlButton,
-                ...(liked ? customStyles.likedButton : {}),
+                ...(isFavorite ? customStyles.likedButton : {}),
               }}
             >
-              <Heart size={20} />
+              <Heart size={20} fill={isFavorite ? "#dc3545" : "none"} color={isFavorite ? "#dc3545" : "#adb5bd"} />
             </button>
           </div>
 

@@ -3,12 +3,32 @@ import { Heart, Search, Disc, Play, Clock, Ellipsis } from 'lucide-react';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { useMusicPlayer } from "../contexts/MusicPlayerContext";
 import axios from 'axios';
+import { notifyFavoritesChanged } from '../utils/favoritesManager';
+import { useMusicPlayer } from '../contexts/MusicPlayerContext';
+
 const SearchPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [favorites, setFavorites] = useState([]);  // Change this to an empty array
+  const [favorites, setFavorites] = useState([]);
   const [musicItems, setMusicItems] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [likedSongs, setLikedSongs] = useState([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [currentPlayingId, setCurrentPlayingId] = useState(null);
+  
+  const { playSong, currentSong } = useMusicPlayer();
+
+  useEffect(() => {
+    if (currentSong && currentSong._id) {
+      setCurrentPlayingId(currentSong._id);
+    } else {
+      setCurrentPlayingId(null);
+    }
+  }, [currentSong]);
+
+  const handlePlaySong = (song) => {
+    playSong(song, musicItems);
+    setCurrentPlayingId(song._id);
+  };
 
   const { playSong } = useMusicPlayer();
     
@@ -50,17 +70,18 @@ const SearchPage = () => {
         });
         
         const data = await response.json();
-        // Extract song IDs from liked songs
+        console.log("Fetched liked songs:", data);
         const likedSongIds = data.map(song => song._id);
+        console.log("Liked song IDs:", likedSongIds);
         setLikedSongs(likedSongIds);
-        setFavorites(likedSongIds); // Update favorites state with liked songs
+        setFavorites(likedSongIds);
       } catch (err) {
         console.error('Error fetching liked songs:', err);
       }
     };
   
     fetchLikedSongs();
-  }, [likedSongs.length]); // Refresh when liked songs count changes
+  }, [refreshTrigger]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -77,7 +98,7 @@ const SearchPage = () => {
         };
         fetchAllSongs();
       }
-    }, 500); // Added a small delay for better UX
+    }, 500);
   
     return () => clearTimeout(timer);
   }, [searchTerm]);
@@ -98,7 +119,6 @@ const SearchPage = () => {
     }
     
     if (favorites.includes(id)) {
-      // Remove from favorites
       setFavorites(favorites.filter(favId => favId !== id));
       try {
         const response = await fetch('http://localhost:5000/api/songs/liked', {
@@ -108,17 +128,21 @@ const SearchPage = () => {
           },
           body: JSON.stringify({ songId: id, userId })
         });
+        
+        if (!response.ok) {
+          throw new Error('Failed to remove from favorites');
+        }
+        
         const data = await response.json();
         console.log(data.message);
-        // Update the likedSongs state
+        
         setLikedSongs(likedSongs.filter(songId => songId !== id));
+        notifyFavoritesChanged();
       } catch (err) {
         console.error('Error removing liked song:', err);
-        // Revert UI state if API call fails
         setFavorites([...favorites]);
       }
     } else {
-      // Add to favorites
       setFavorites([...favorites, id]);
       try {
         const response = await fetch('http://localhost:5000/api/songs/liked', {
@@ -128,13 +152,18 @@ const SearchPage = () => {
           },
           body: JSON.stringify({ songId: id, userId })
         });
+        
+        if (!response.ok) {
+          throw new Error('Failed to add to favorites');
+        }
+        
         const data = await response.json();
         console.log(data.message);
-        // Update the likedSongs state
+        
         setLikedSongs([...likedSongs, id]);
+        notifyFavoritesChanged();
       } catch (err) {
         console.error('Error adding liked song:', err);
-        // Revert UI state if API call fails
         setFavorites(favorites.filter(favId => favId !== id));
       }
     }
@@ -260,6 +289,7 @@ const SearchPage = () => {
             <tbody>
               {musicItems.map((item, index) => {
                 const isFavorite = favorites.includes(item._id);
+                const isPlaying = currentPlayingId === item._id;
                 
                 return (
                   <tr
@@ -374,6 +404,10 @@ e.currentTarget.style.boxShadow = 'none';
         }
         tr:hover .song-number {
           opacity: 0;
+        }
+        tr.active-song .song-title {
+          color: #f87171 !important;
+          text-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
         }
         tr:hover .song-title {
           color: #f87171 !important;
