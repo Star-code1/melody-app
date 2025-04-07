@@ -46,7 +46,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // API routes
 app.use("/api/users", userRoutes);
-app.use("/api/tracks", songRoutes); // Changed from /api/songs to /api/tracks
+app.use("/api/songs", songRoutes);
 
 // Serve static assets in production
 // Determine if we're in production
